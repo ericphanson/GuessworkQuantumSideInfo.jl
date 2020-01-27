@@ -1,0 +1,5 @@
+[deps]
+Convex = "f65535da-76fb-5f13-bab9-19810c17039a"
+GenericLinearAlgebra = "14197337-ba66-59df-a3e3-ca00e7dcff7a"
+GuessworkQuantumSideInfo = "43bf2e5e-2e2b-4a4c-a80a-78ff5d909e07"
+SDPAFamily = "bfe18334-aefd-11e9-1109-4bf2b15a5b91"
