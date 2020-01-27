@@ -1,6 +1,9 @@
 using GuessworkQuantumSideInfo
 using Documenter
 
+previous_GKSwstype = get(ENV, "GKSwstype", "")
+ENV["GKSwstype"] = "100"
+
 makedocs(;
     modules=[GuessworkQuantumSideInfo],
     authors="Eric P. Hanson",
@@ -19,3 +22,5 @@ makedocs(;
 deploydocs(;
     repo="github.com/ericphanson/GuessworkQuantumSideInfo.jl",
 )
+
+ENV["GKSwstype"] = previous_GKSwstype;

@@ -37,6 +37,9 @@ jobs:
       - uses: julia-actions/setup-julia@v1
         with:
           version: '1.0'
+      - run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
       - run: julia --project=docs -e '
           using Pkg;
           Pkg.develop(PackageSpec(; path=pwd()));
@@ -44,3 +47,4 @@ jobs:
       - run: julia --project=docs docs/make.jl
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
