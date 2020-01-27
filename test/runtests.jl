@@ -1,4 +1,4 @@
-using Test, GuessworkQuantumSideInfo, LinearAlgebra, Statistics, Random
+using Test, GuessworkQuantumSideInfo, LinearAlgebra, Statistics, Random, UnPack
 using Combinatorics: multiset_permutations
 using SCS
 
