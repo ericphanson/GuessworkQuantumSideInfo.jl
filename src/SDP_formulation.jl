@@ -82,7 +82,7 @@ end
         ρBs::AbstractVector{<:AbstractMatrix};
         solver,
         K::Integer = length(p),
-        c = numeric_type[1:K..., 10_000],
+        c = numeric_type[1:K..., 5_000],
         dual::Bool = false,
         remove_repetition::Bool = true,
         povm_outcomes = make_povm_outcomes(length(p), K, remove_repetition),
@@ -97,7 +97,7 @@ function guesswork(
     ρBs::AbstractVector{<:AbstractMatrix};
     solver,
     K::Integer = length(p),
-    c = numeric_type[1:K..., 10_000],
+    c = numeric_type[1:K..., 5_000],
     dual::Bool = false,
     remove_repetition::Bool = true,
     povm_outcomes = make_povm_outcomes(length(p), K, remove_repetition),

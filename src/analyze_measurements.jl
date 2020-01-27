@@ -18,14 +18,16 @@ function pmfN(data; tol = 1e-5)
 
     probs = [_prob(n, data, tol, T) for n = 1:K]
 
-    prob_no_guess = 1 - sum(probs)
+    if K < length(p)
+        prob_no_guess = 1 - sum(probs)
 
-    if prob_no_guess < 0
-        prob_no_guess < -tol && @warn "Probability negative " prob_no_guess
-        prob_no_guess = zero(T)
+        if prob_no_guess < 0
+            prob_no_guess < -tol && @warn "Probability negative " prob_no_guess
+            prob_no_guess = zero(T)
+        end
+
+        push!(probs, prob_no_guess)
     end
-
-    push!(probs, prob_no_guess)
 
     return probs
 end
