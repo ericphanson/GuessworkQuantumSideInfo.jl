@@ -29,9 +29,9 @@ using GuessworkQuantumSideInfo, SCS
 p = [0.25, 0.25, 0.25, 0.25];
 ketzero = ket(1, 2);
 ketone = ket(2, 2);
-ketplus = (ket(1, 2) + ket(2,2))/sqrt(2);
 ketminus = (ket(1, 2) - ket(2,2))/sqrt(2);
-ρBs = dm.([ ketplus, ketminus, ketzero, ketone  ])
+ketplus = (ket(1, 2) + ket(2,2))/sqrt(2);
+ρBs = dm.([ ketzero, ketone, ketminus, ketplus  ])
 output = guesswork(p, ρBs; solver = SCSSolver(verbose=false));
 output.optval
 ```

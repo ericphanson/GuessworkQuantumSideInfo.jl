@@ -29,21 +29,22 @@ julia> ketzero = ket(1, 2);
 
 julia> ketone = ket(2, 2);
 
-julia> ketplus = (ket(1, 2) + ket(2,2))/sqrt(2);
-
 julia> ketminus = (ket(1, 2) - ket(2,2))/sqrt(2);
 
-julia> ρBs = dm.([ ketplus, ketminus, ketzero, ketone  ])
+julia> ketplus = (ket(1, 2) + ket(2,2))/sqrt(2);
+
+julia> ρBs = dm.([ ketzero, ketone, ketminus, ketplus  ])
 4-element Array{Array{Complex{Float64},2},1}:
- [0.4999999999999999 + 0.0im 0.4999999999999999 + 0.0im; 0.4999999999999999 + 0.0im 0.4999999999999999 + 0.0im]  
- [0.4999999999999999 + 0.0im -0.4999999999999999 - 0.0im; -0.4999999999999999 + 0.0im 0.4999999999999999 + 0.0im]
  [1.0 + 0.0im 0.0 + 0.0im; 0.0 + 0.0im 0.0 + 0.0im]                                                              
  [0.0 + 0.0im 0.0 + 0.0im; 0.0 + 0.0im 1.0 + 0.0im]                                                              
+ [0.4999999999999999 + 0.0im -0.4999999999999999 - 0.0im; -0.4999999999999999 + 0.0im 0.4999999999999999 + 0.0im]
+ [0.4999999999999999 + 0.0im 0.4999999999999999 + 0.0im; 0.4999999999999999 + 0.0im 0.4999999999999999 + 0.0im]  
 
 julia> output = guesswork(p, ρBs; solver = SCSSolver(verbose=false));
 
 julia> output.optval
-1.7094306690270955
+1.709431078700102
+
 ```
 
 It turns out it takes `(1/4)*(10 - sqrt(10)) ≈ 1.71` guesses on average.
