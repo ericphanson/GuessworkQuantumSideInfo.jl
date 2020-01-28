@@ -44,19 +44,6 @@ Random.seed!(5)
 
 @testset "GuessworkQuantumSideInfo.jl" begin
 
-    @testset "randpure" begin
-        for d in (2, 3, 5)
-            for _ = 1:5
-                ψ = randpure(d)
-                @test tr(ψ) ≈ 1.0
-                @test tr(ψ^2) ≈ 1.0 atol = 1e-6
-                @test imag.(eigvals(ψ)) ≈ zeros(d) atol = 1e-8
-                @test minimum(real.(eigvals(ψ))) ≈ 0.0 atol = 1e-8
-            end
-        end
-
-    end
-
     @testset "Uninformative side information" begin
         ρBs = dm.([ketzero, ketzero])
         p = [0.5, 0.5]
@@ -68,7 +55,7 @@ Random.seed!(5)
         lb = guesswork_lower_bound(p, ρBs; solver = default_sdp_solver()).optval
         @test lb <= output.optval + 1e-4
 
-        ub = guesswork_upper_bound(p, ρBs, 2^2 + 1; make_solver = default_sdp_solver).optval
+        ub = guesswork_upper_bound(p, ρBs; num_constraints = 2^2 + 1, make_solver = default_sdp_solver).optval
         @test output.optval <= ub + 1e-4
 
     end
@@ -85,7 +72,7 @@ Random.seed!(5)
         lb = guesswork_lower_bound(p, ρBs; solver = default_sdp_solver()).optval
         @test lb <= output.optval + 1e-4
 
-        ub = guesswork_upper_bound(p, ρBs, 2^2 + 1; make_solver = default_sdp_solver).optval
+        ub = guesswork_upper_bound(p, ρBs; num_constraints =  2^2 + 1, make_solver = default_sdp_solver).optval
         @test output.optval <= ub + 1e-4
     end
 
@@ -100,7 +87,7 @@ Random.seed!(5)
         lb = guesswork_lower_bound(p, ρBs; solver = default_sdp_solver()).optval
         @test lb <= output.optval + 1e-4
 
-        ub = guesswork_upper_bound(p, ρBs, 2^2 + 1; make_solver = default_sdp_solver).optval
+        ub = guesswork_upper_bound(p, ρBs; num_constraints =  2^2 + 1, make_solver = default_sdp_solver).optval
         @test output.optval <= ub + 1e-4
     end
 
@@ -113,7 +100,7 @@ Random.seed!(5)
         lb = guesswork_lower_bound(p, ρBs; solver = default_sdp_solver()).optval
         @test lb <= output.optval + 1e-4
 
-        ub = guesswork_upper_bound(p, ρBs, 2^2 + 1; make_solver = default_sdp_solver).optval
+        ub = guesswork_upper_bound(p, ρBs; num_constraints =  2^2 + 1, make_solver = default_sdp_solver).optval
         @test output.optval <= ub + 1e-4
     end
 
@@ -125,7 +112,7 @@ Random.seed!(5)
         lb = guesswork_lower_bound(p, ρBs; solver = default_sdp_solver()).optval
         @test lb <= output.optval + 1e-4
 
-        ub = guesswork_upper_bound(p, ρBs, 3^2 + 1; make_solver = default_sdp_solver).optval
+        ub = guesswork_upper_bound(p, ρBs; num_constraints =  3^2 + 1, make_solver = default_sdp_solver).optval
         @test output.optval <= ub + 1e-4
     end
 
@@ -140,12 +127,12 @@ Random.seed!(5)
         lb = guesswork_lower_bound(p, ρBs; solver = default_sdp_solver()).optval
         @test lb <= output.optval + 1e-4
 
-        ub = guesswork_upper_bound(p, ρBs, 2^2 + 1; make_solver = default_sdp_solver).optval
+        ub = guesswork_upper_bound(p, ρBs; num_constraints =  2^2 + 1, make_solver = default_sdp_solver).optval
         @test output.optval <= ub + 1e-4
     end
 
     @testset "BB84" begin
-        ρBs = GuessworkQuantumSideInfo.BB84_states()
+        ρBs = BB84_states()
 
         # make sure we have the right states...
         @test Set(ρBs) == Set(dm.([ketzero, ketone, ketplus, ketminus]))
@@ -163,7 +150,7 @@ Random.seed!(5)
             @test output_MISDP.optval ≈ output.optval rtol = 1e-4
         end
 
-        relaxed_output = guesswork_upper_bound(p, ρBs, 4; make_solver = default_sdp_solver)
+        relaxed_output = guesswork_upper_bound(p, ρBs; num_constraints = 4, make_solver = default_sdp_solver)
 
         @test output.optval ≈ relaxed_output.optval rtol = 1e-4
 
@@ -186,15 +173,15 @@ Random.seed!(5)
         lb = guesswork_lower_bound(p, ρBs; solver = default_sdp_solver()).optval
         @test lb <= output.optval + 1e-4
 
-        ub = guesswork_upper_bound(p, ρBs, 2^2 + 1; make_solver = default_sdp_solver).optval
+        ub = guesswork_upper_bound(p, ρBs; num_constraints =  2^2 + 1, make_solver = default_sdp_solver).optval
         @test output.optval <= ub + 1e-4
     end
 
     @testset "Upper bound" begin
-        ρBs = GuessworkQuantumSideInfo.BB84_states()
+        ρBs = BB84_states()
         J = length(ρBs)
         p = ones(J) / J
-        @test_throws ArgumentError guesswork_upper_bound(p, ρBs, Inf; max_time=Inf, max_retries = Inf, make_solver = default_sdp_solver)
+        @test_throws ArgumentError guesswork_upper_bound(p, ρBs; num_constraints = Inf, max_time=Inf, max_retries = Inf, make_solver = default_sdp_solver)
         @test_logs (:info, r"Adding constraint") match_mode=:any guesswork_upper_bound(p, ρBs; verbose=true, make_solver = default_sdp_solver, max_time = 2)
     end
 
@@ -202,10 +189,10 @@ Random.seed!(5)
     @testset "Concavity of the guesswork" begin
         J = 3
         dB = 2
-        p_1 = GuessworkQuantumSideInfo.randprobvec(J)
+        p_1 = randprobvec(J)
         ρBs_1 = [randdm(dB) for _ = 1:J]
 
-        p_2 = GuessworkQuantumSideInfo.randprobvec(J)
+        p_2 = randprobvec(J)
         ρBs_2 = [randdm(dB) for _ = 1:J]
 
         λ = rand()

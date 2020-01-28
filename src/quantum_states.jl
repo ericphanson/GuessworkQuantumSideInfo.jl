@@ -1,7 +1,41 @@
 ## Notation
-ketbra(::Type{T}, i::Integer, j::Integer, d::Integer) where {T} =
-    sparse([i], [j], [one(complex(T))], d, d)
+"""
+    ket([T = Float64], i::Integer, d::Integer) -> SparseVector{Complex{T}}
+
+Create a vector representing the `i`th computational basis vector in dimension `d`.
+
+## Example
+
+```jldoctest
+julia> ket(1,2)
+2-element SparseVector{Complex{Float64},Int64} with 1 stored entry:
+  [1]  =  1.0+0.0im
+
+julia> collect(ans)
+2-element Array{Complex{Float64},1}:
+ 1.0 + 0.0im
+ 0.0 + 0.0im
+```
+"""
 ket(::Type{T}, i::Integer, d::Integer) where {T} = sparsevec([i], [one(complex(T))], d)
+
+"""
+    bra([T = Float64], i::Integer, d::Integer) -> SparseVector{Complex{T}}'
+
+Create a dual vector representing the bra associated to `i`th computational basis vector in dimension `d`.
+
+## Example
+
+```jldoctest
+julia> bra(1,2)
+1×2 LinearAlgebra.Adjoint{Complex{Float64},SparseVector{Complex{Float64},Int64}}:
+ 1.0-0.0im  0.0-0.0im
+
+julia> collect(ans)
+1×2 Array{Complex{Float64},2}:
+ 1.0-0.0im  0.0-0.0im
+```
+"""
 bra(::Type{T}, i::Integer, d::Integer) where {T} = ket(T, i, d)'
 
 ket(i::Integer, d::Integer) = ket(Float64, i, d)
@@ -38,18 +72,12 @@ function BB84_states(::Type{T}) where {T<:Number}
     return dm.([ketzero, ketone, ketminus, ketplus])
 end
 
-six_states() = six_states(Float64)
+"""
+    iid_copies(ρBs::AbstractVector{<:AbstractMatrix}, n::Integer) -> Vector{Matrix}
 
-function six_states(::Type{T}) where {T<:Number}
-    ketplus = (ket(T, 1, 2) + ket(T, 2, 2)) / sqrt(T(2))
-    ketminus = (ket(T, 1, 2) - ket(T, 2, 2)) / sqrt(T(2))
-    ketzero = ket(T, 1, 2)
-    ketone = ket(T, 2, 2)
-    ketyplus = ketzero + im * ketone
-    ketyminus = ketzero - im * ketone
-    return ρBs = dm.([ketzero, ketone, ketminus, ketplus, ketyplus, ketyminus])
-end
-
+Create a vector of all states of the form ``ρ_1 \\otimes \\dotsm \\otimes ρ_n``
+where the ``ρ_i`` range over the set `ρBs`.
+"""
 function iid_copies(ρBs::AbstractVector{<:AbstractMatrix}, n::Integer)
     inds = cartesian_power(length(ρBs), n)
     [foldl(⊗, ρBs[collect(I)]) for I in inds]
@@ -75,6 +103,17 @@ end
     randprobvec([T=Float64], d)
 
 Generates points of type `T`, uniformly at random on the standard `d-1` dimensional simplex using an algorithm by [Smith and Tromble](http://www.cs.cmu.edu/~nasmith/papers/smith+tromble.tr04.pdf).
+
+## Example
+
+```julia
+julia> randprobvec(3)
+3-element Array{Float64,1}:
+ 0.24815974900033688
+ 0.17199716455672287
+ 0.5798430864429402 
+
+```
 """
 randprobvec(T::Type, d::Integer) = simplexpt(rand(T, d - 1))
 randprobvec(d::Integer) = randprobvec(Float64, d)
@@ -97,9 +136,19 @@ end
 randunitary(d::Integer) = randunitary(Float64, d)
 
 """
-    randdm(T, d)
+    randdm([T = Float64], d)
 
-Generates a density matrix of dimension `d` at random.
+Generates a density matrix with numeric type `Complex{T}`, of dimension `d` at
+random.
+
+## Example
+
+```julia
+julia> randdm(2)
+2×2 Array{Complex{Float64},2}:
+ 0.477118+0.0im        0.119848-0.0371569im
+ 0.119848+0.0371569im  0.522882+0.0im      
+```
 """
 function randdm(T::Type, d::Integer)
     eigs = diagm(0 => randprobvec(T, d))
@@ -108,16 +157,3 @@ function randdm(T::Type, d::Integer)
     return Matrix((ρ + ρ') / 2)
 end
 randdm(d) = randdm(Float64, d)
-
-"""
-    randpure(T, d)
-
-Generates a pure state density matrix of dimension `d` at random.
-"""
-function randpure(T::Type, d::Integer)
-    U = randunitary(T, d)
-    x = T.(randn(d))
-    normalize!(x)
-    return dm(U * x)
-end
-randpure(d::Integer) = randpure(Float64, d)

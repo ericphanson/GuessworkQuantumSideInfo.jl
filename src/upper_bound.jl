@@ -1,15 +1,53 @@
+"""
+    guesswork_upper_bound(
+        p::AbstractVector{T},
+        ρBs::AbstractVector{<:AbstractMatrix};
+        make_solver,
+        K::Integer = length(p),
+        c::AbstractVector = T[1:K..., 10_000],
+        max_retries = 50,
+        max_time = Inf,
+        num_constraints = Inf,
+        verbose::Bool = false,
+        num_steps_per_SA_run::Integer = length(p)^2 * 500,
+    ) where {T<:Number} -> NamedTuple
+
+Computes an upper bound to the guesswork problem associated to the c-q state
+specified by `p` and `ρBs`, as in [`guesswork`](@ref). The number of allowed
+guesses `K`, and a custom cost vector `c` may be optionally passed. If the
+keyword argument `verbose` is set to true, information is printed about each
+iteration of the algorithm.
+
+The keyword argument `make_solver` is required, and must pass a *function that
+creates a solver instances*. For example, instead of passing `SCSSolver()`, pass
+`() -> SCSSolver()`. This is needed because the algorithm used in
+`guesswork_upper_bound` solves a sequence of SDPs, not just one.
+
+The algorithm has three termination criteria which are controlled by keyword
+arguments. The algorithm stops when any of the following occur:
+
+* `max_retries` simulated annealing attempts fail to find a violated constraint.
+* `num_constraints` constraints have been added to the dual SDP
+* The total runtime of the algorithm is projected to exceed `max_time` on the next iteration.
+
+By default, `max_retries` is set to 50, while `num_constraints` and `max_time` are set to infinity.
+
+Lastly, the keyword argument `num_steps_per_SA_run` controls the runtime of the
+simulated annealing algorithm. Increase `num_steps_per_SA_run` to search longer
+for a violated constraint within a given simulated annealing run.
+"""
 function guesswork_upper_bound(
     p::AbstractVector{T},
-    ρBs::AbstractVector{<:AbstractMatrix},
-    num_constraints = Inf;
-    K::Integer = length(p),
-    mutate! = rand_rev!,
+    ρBs::AbstractVector{<:AbstractMatrix};
     make_solver,
+    K::Integer = length(p),
     c::AbstractVector = T[1:K..., 10_000],
-    verbose::Bool = false,
     max_retries = 50,
-    num_steps_per_SA_run::Integer = length(p)^2 * 500,
     max_time = Inf,
+    num_constraints = Inf,
+    verbose::Bool = false,
+    num_steps_per_SA_run::Integer = length(p)^2 * 500,
+    mutate! = rand_rev!,
     debug = false,
 ) where {T<:Number}
 
@@ -48,6 +86,8 @@ function guesswork_upper_bound(
 
     total_time_so_far::Float64 = 0.0
 
+    # run the main loop
+    # verbose is passed as a "value type" so logging statements can be compiled out when it is set to false.
     upper_bound = _loop(
         upper_bound,
         R_scratch,
@@ -80,6 +120,7 @@ function guesswork_upper_bound(
     )
 end
 
+# We put the inner loop behind a function barrier
 function _loop(
     upper_bound::T,
     R_scratch,
@@ -119,11 +160,14 @@ function _loop(
             fval = SA!(π, scratch_π, f, mutate!, num_steps_per_SA_run)
         end
         total_time_so_far += SA_time
-        # add the permutation to the list of constraints.
+
         if fval < 0
+            # add the permutation to the list of constraints and resolve the problem.
             new_constraint = copy(π)
+
             push!(constraints, new_constraint)
             update_problem!(convex_problem, convex_Y, new_constraint, convex_R)
+
             solve_time = @elapsed solve!(convex_problem, make_solver(); verbose = verbose)
             upper_bound::T = convex_problem.optval
 
@@ -138,6 +182,7 @@ function _loop(
                 )
             end
         else
+            # We've reached `max_retries` attempts to find a violated constraint.
             verbose && _log_retries(max_retries)
             break
         end
@@ -146,8 +191,9 @@ function _loop(
         # that will exceed the max time.
         projected_time = total_time_so_far + 1.1*(SA_time + solve_time)
         if projected_time > max_time
-            verbose &&
-            _log_time(total_time_so_far, total_time_so_far + SA_time + solve_time, max_time)
+            if verbose
+                _log_time(total_time_so_far, total_time_so_far + SA_time + solve_time, max_time)
+            end
             break
         end
 
