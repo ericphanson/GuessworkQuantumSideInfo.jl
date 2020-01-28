@@ -2,8 +2,8 @@
 
 [![Build Status](https://github.com/ericphanson/GuessworkQuantumSideInfo.jl/workflows/CI/badge.svg)](https://github.com/ericphanson/GuessworkQuantumSideInfo.jl/actions)
 [![Coverage](https://codecov.io/gh/ericphanson/GuessworkQuantumSideInfo.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/ericphanson/GuessworkQuantumSideInfo.jl)
-[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://ericphanson.github.io/GuessworkQuantumSideInfo.jl/stable)
-[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://ericphanson.github.io/GuessworkQuantumSideInfo.jl/dev)
+[![Stable documentation](https://img.shields.io/badge/documentation-stable-blue.svg)](https://ericphanson.github.io/GuessworkQuantumSideInfo.jl/stable)
+[![Dev documentation](https://img.shields.io/badge/documentation-dev-blue.svg)](https://ericphanson.github.io/GuessworkQuantumSideInfo.jl/dev)
 [![arXiv article](https://img.shields.io/badge/article-arXiv%3A2001.03598-B31B1B)](https://arxiv.org/abs/2001.03598)
 
 This is a package accompanying the preprint [*Guesswork with Quantum Side Information*](https://arxiv.org/abs/2001.03598).
