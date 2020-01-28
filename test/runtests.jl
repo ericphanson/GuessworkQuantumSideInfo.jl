@@ -100,13 +100,24 @@ Random.seed!(5)
         ρBs = [randdm(2) for _ = 1:3]
         p = ones(3) / 3
 
-        output = test_optimize(p, ρBs; test_MISDP = false)
+        @testset "Basic tests" begin
+            output = test_optimize(p, ρBs; test_MISDP = false)
+            
+            lb = guesswork_lower_bound(p, ρBs; solver = default_sdp_solver()).optval
+            @test lb <= output.optval + TOL
 
-        lb = guesswork_lower_bound(p, ρBs; solver = default_sdp_solver()).optval
-        @test lb <= output.optval + TOL
+            ub = guesswork_upper_bound(p, ρBs; num_constraints =  2^2 + 1, make_solver = default_sdp_solver).optval
+            @test output.optval <= ub + TOL
+        end
 
-        ub = guesswork_upper_bound(p, ρBs; num_constraints =  2^2 + 1, make_solver = default_sdp_solver).optval
-        @test output.optval <= ub + TOL
+        @testset "Custom cost vector" begin
+            c = cumsum(10*rand(3)) # increasing vector
+            output_c = test_optimize(p, ρBs; test_MISDP = false, c = c)
+            lb_c = guesswork_lower_bound(p, ρBs; solver = default_sdp_solver(), c = c).optval
+            @test lb_c <= output_c.optval + TOL
+            ub_c = guesswork_upper_bound(p, ρBs; num_constraints =  2^2 + 1, make_solver = default_sdp_solver, c = c).optval
+            @test output_c.optval <= ub_c + TOL
+        end
     end
 
     @testset "Three random qutrits" begin
@@ -126,14 +137,19 @@ Random.seed!(5)
         ρBs = [randdm(2) for _ = 1:4]
         p = [0.25, 0.25, 0.25, 0.25]
 
+        @testset "Basic tests" begin
+            output = test_optimize(p, ρBs; test_MISDP = false)
 
-        output = test_optimize(p, ρBs; test_MISDP = false)
+            lb = guesswork_lower_bound(p, ρBs; solver = default_sdp_solver()).optval
+            @test lb <= output.optval + TOL
 
-        lb = guesswork_lower_bound(p, ρBs; solver = default_sdp_solver()).optval
-        @test lb <= output.optval + TOL
+            ub = guesswork_upper_bound(p, ρBs; num_constraints =  2^2 + 1, make_solver = default_sdp_solver).optval
+            @test output.optval <= ub + TOL
+        end
 
-        ub = guesswork_upper_bound(p, ρBs; num_constraints =  2^2 + 1, make_solver = default_sdp_solver).optval
-        @test output.optval <= ub + TOL
+        @testset "K=2 guesses" begin
+            output_K = test_optimize(p, ρBs; test_MISDP = false, K = 2)
+        end
     end
 
     @testset "BB84" begin

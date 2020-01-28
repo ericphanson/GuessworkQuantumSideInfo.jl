@@ -1,6 +1,6 @@
 Base.isapprox(x) = Base.Fix2(isapprox, x)
 
-function testPOVM(Es; tol = 1e-3)
+function testPOVM(Es; tol = TOL)
     dB = size(first(Es), 1)
     @test sum(Es) ≈ complex(1.0) * I(dB) atol = tol
 
@@ -24,7 +24,7 @@ function test_misdp_objective_value(data)
         tot_cost += cost
     end
 
-    @test tot_cost ≈ data.optval rtol = 1e-4
+    @test tot_cost ≈ data.optval rtol = TOL
 end
 
 
@@ -34,7 +34,7 @@ function test_optimize(
     true_opt_val = nothing;
     test_repetition = false,
     test_MISDP = true,
-    kwargs...,
+    kwargs...
 )
     optvals = []
     test_data = []
@@ -42,14 +42,14 @@ function test_optimize(
     for dual in (true, false)
         for remove_repetition in (test_repetition ? (false, true) : (true,))
             for (solver, solver_name) in ((SCSSolver(verbose = 0), :SCS),)
-                current_output = guesswork(p, ρBs; solver = solver, kwargs...)
+                current_output = guesswork(p, ρBs; solver = solver, dual = dual, remove_repetition = remove_repetition, kwargs...)
                 push!(optvals, current_output.optval)
                 push!(
                     test_data,
                     (
                         opval = current_output.optval,
                         solver = solver_name,
-                        params = (dual = dual, remove_repetition = remove_repetition),
+                        params = (dual = dual, remove_repetition = remove_repetition, kwargs...),
                     ),
                 )
 
@@ -58,14 +58,14 @@ function test_optimize(
             if TEST_MATLAB
                 # `GuessworkQuantumSideInfo.guesswork_MATLAB` only exists if `include("test_matlab.jl")` is called.
                 current_output =
-                    GuessworkQuantumSideInfo.guesswork_MATLAB(p, ρBs; kwargs...)
+                    GuessworkQuantumSideInfo.guesswork_MATLAB(p, ρBs; dual = dual, remove_repetition = remove_repetition, kwargs...)
                 push!(optvals, current_output.optval)
                 push!(
                     test_data,
                     (
                         opval = current_output.optval,
                         solver = :MATLAB,
-                        params = (dual = dual, remove_repetition = remove_repetition),
+                        params = (dual = dual, remove_repetition = remove_repetition, kwargs...),
                     ),
                 )
             end
@@ -111,7 +111,7 @@ function test_optimize(
         true_opt_val = mean(optvals)
     end
 
-    all_close_to_optimal = all(x -> isapprox(x, true_opt_val; rtol = 1e-4), optvals)
+    all_close_to_optimal = all(x -> isapprox(x, true_opt_val; rtol = TOL), optvals)
 
     # some helpful information in case of test failure
     if !all_close_to_optimal
