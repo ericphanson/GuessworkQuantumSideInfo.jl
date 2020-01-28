@@ -17,6 +17,7 @@ makedocs(;
     pages=[
         "Home" => "index.md",
         "Examples" => "examples.md",
+        "High precision example" => "high-precision-example.md",
     ],
 )
 
