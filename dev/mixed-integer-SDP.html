@@ -3,19 +3,6 @@
 
 julia&gt; using Pajarito, Cbc, SCS # solvers
 WARNING: Method definition findnz(AbstractArray{T, 2} where T) in module Pajarito at /home/runner/.julia/packages/Pajarito/PL3Lt/src/Pajarito.jl:42 overwritten in module ConicBenchmarkUtilities at /home/runner/.julia/packages/ConicBenchmarkUtilities/HFwIl/src/ConicBenchmarkUtilities.jl:17.
-ERROR: LoadError: SCS not properly installed. Please run Pkg.build(&quot;SCS&quot;) and restart julia
-Stacktrace:
- [1] error(::String) at ./error.jl:33
- [2] top-level scope at /home/runner/.julia/packages/SCS/kaB3C/src/SCS.jl:6
- [3] include at ./boot.jl:317 [inlined]
- [4] include_relative(::Module, ::String) at ./loading.jl:1044
- [5] include(::Module, ::String) at ./sysimg.jl:29
- [6] top-level scope at none:2
- [7] eval at ./boot.jl:319 [inlined]
- [8] eval(::Expr) at ./client.jl:393
- [9] top-level scope at ./none:3
-in expression starting at /home/runner/.julia/packages/SCS/kaB3C/src/SCS.jl:3
-ERROR: Failed to precompile SCS [c946c3f1-0d1f-5ce8-9dea-7daa1f7e2d13] to /home/runner/.julia/compiled/v1.0/SCS/uaibp.ji.
 
 julia&gt; function misdp_solver(; verbose = false)
            sdp_solver = SCSSolver(verbose=0)
@@ -46,11 +33,16 @@ julia&gt; ρBs = BB84_states()
  [0.5+0.0im 0.5+0.0im; 0.5+0.0im 0.5+0.0im]
 
 julia&gt; output = guesswork_MISDP(p, ρBs, 2; verbose=false, solver = misdp_solver());
-ERROR: UndefVarError: SCSSolver not defined
+┌ Warning: Repeated integer solution without converging
+└ @ Pajarito ~/.julia/packages/Pajarito/PL3Lt/src/conic_algorithm.jl:1687
 
 julia&gt; output.optval
-ERROR: UndefVarError: output not defined
+1.7093466142145592
 
 julia&gt; output.Es
-ERROR: UndefVarError: output not defined</code></pre><p>We see that with only two measurement outcomes we recover the same optimal value as the case without a constraint on  the number of measurement outcomes (in <a href="examples.html#Example-2:-the-BB84-states-1">Example 2: the BB84 states</a>). We&#39;ve thus found an extremal strategy (in that the POVM associated to this strategy cannot be written as the convex combination of two other POVMs). Often, the solutions returned by <a href="index.html#GuessworkQuantumSideInfo.guesswork"><code>guesswork</code></a> do not return extremal POVMs, although the details depend on the SDP solver used.</p><p>We can see what the associated guessing orders are:</p><pre><code class="language-julia-repl">julia&gt; output.povm_outcomes
-ERROR: UndefVarError: output not defined</code></pre><p>To summarize, one optimal strategy for the case of <code>p</code> uniform, and <code>ρBs</code> given by the four BB84 states, is to perform a projective measurement whose operators are given by <code>output.Es</code> above, and then make guesses in one of the two orders given by <code>output.povm_outcomes</code> (depending on which measurement outcome was obtained).</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="high-precision-example.html">« High precision example</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Tuesday 28 January 2020 16:50">Tuesday 28 January 2020</span>. Using Julia version 1.0.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+2-element Array{Array{Complex{Float64},2},1}:
+ [0.658108+1.48659e-13im -0.474346-3.4061e-13im; -0.474336-3.40536e-13im 0.341883-8.82227e-14im]
+ [0.341883+3.15817e-13im 0.474346-6.54833e-13im; 0.474336-6.55177e-13im 0.658108-3.76682e-15im]</code></pre><p>We see that with only two measurement outcomes we recover the same optimal value as the case without a constraint on  the number of measurement outcomes (in <a href="examples.html#Example-2:-the-BB84-states-1">Example 2: the BB84 states</a>). We&#39;ve thus found an extremal strategy (in that the POVM associated to this strategy cannot be written as the convex combination of two other POVMs). Often, the solutions returned by <a href="index.html#GuessworkQuantumSideInfo.guesswork"><code>guesswork</code></a> do not return extremal POVMs, although the details depend on the SDP solver used.</p><p>We can see what the associated guessing orders are:</p><pre><code class="language-julia-repl">julia&gt; output.povm_outcomes
+2-element Array{NTuple{4,Int64},1}:
+ (3, 1, 2, 4)
+ (4, 2, 1, 3)</code></pre><p>To summarize, one optimal strategy for the case of <code>p</code> uniform, and <code>ρBs</code> given by the four BB84 states, is to perform a projective measurement whose operators are given by <code>output.Es</code> above, and then make guesses in one of the two orders given by <code>output.povm_outcomes</code> (depending on which measurement outcome was obtained).</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="high-precision-example.html">« High precision example</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Tuesday 28 January 2020 17:09">Tuesday 28 January 2020</span>. Using Julia version 1.0.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
