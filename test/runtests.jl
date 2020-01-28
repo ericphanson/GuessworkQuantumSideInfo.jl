@@ -197,12 +197,21 @@ Random.seed!(5)
         @test output.optval <= ub + TOL
     end
 
-    @testset "Upper bound" begin
+    @testset "Errors and logging" begin
         ρBs = BB84_states()
         J = length(ρBs)
         p = ones(J) / J
         @test_throws ArgumentError guesswork_upper_bound(p, ρBs; num_constraints = Inf, max_time=Inf, max_retries = Inf, make_solver = default_sdp_solver)
         @test_logs (:info, r"Adding constraint") match_mode=:any guesswork_upper_bound(p, ρBs; verbose=true, make_solver = default_sdp_solver, max_time = 2)
+
+        @test_logs (:info, r"MISDP solve") match_mode=:any guesswork_MISDP(randprobvec(2), [randdm(2) for _ = 1:2], 5; verbose=true, solver = misdp_solver())
+
+        two_states = [randdm(2) for _ = 1:2]
+        p_3 = randprobvec(3)
+        @test_throws ArgumentError guesswork_MISDP(p_3, two_states, 5; solver = misdp_solver())
+        @test_throws ArgumentError guesswork(p_3, two_states; solver = default_sdp_solver())
+        @test_throws ArgumentError guesswork_lower_bound(p_3, two_states; solver = default_sdp_solver())
+        @test_throws ArgumentError guesswork_upper_bound(p_3, two_states; make_solver = default_sdp_solver)
     end
 
 
@@ -260,6 +269,7 @@ Random.seed!(5)
         @test ket(1,2) ≈ ket(Float64, 1, 2)
         @test bra(1, 2) ≈ bra(Float64, 1, 2)
         @test eltype(randdm(2)) == Complex{Float64}
+        @test eltype(GuessworkQuantumSideInfo.randunitary(2)) == Complex{Float64}
         @test eltype(randprobvec(2)) == Float64
     end
 end
