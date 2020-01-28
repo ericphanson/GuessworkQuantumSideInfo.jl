@@ -1,5 +1,5 @@
 using Test, GuessworkQuantumSideInfo, LinearAlgebra, Statistics, Random, UnPack
-using Combinatorics: multiset_permutations
+using GenericLinearAlgebra
 using SCS
 
 TEST_MATLAB = false # requires MATLAB and MATLAB.jl installed
@@ -149,16 +149,15 @@ Random.seed!(5)
 
         @testset "K=2 guesses" begin
             output_K = test_optimize(p, ρBs; test_MISDP = false, K = 2)
+            pmf = pmfN(output_K)
+            @test length(pmf) == 3
+            @test sum(pmf) ≈ 1.0 atol = TOL
+            @test all(x -> x >= -TOL, pmf)
         end
     end
 
     @testset "BB84" begin
         ρBs = BB84_states()
-
-        # make sure we have the right states...
-        @test Set(ρBs) == Set(dm.([ketzero, ketone, ketplus, ketminus]))
-        @test length(ρBs) == 4
-
         p = ones(4) / 4
         output = guesswork(p, ρBs; solver = default_sdp_solver())
         testPOVM(output.Es)
@@ -225,5 +224,42 @@ Random.seed!(5)
         g_1 = guesswork(p_1, ρBs_1; solver = default_sdp_solver()).optval
         g_2 = guesswork(p_2, ρBs_2; solver = default_sdp_solver()).optval
         @test TOL + g_avg >= λ*g_1 + (1-λ)*g_2
+    end
+
+    @testset "Quantum states" begin
+        for T in (BigFloat, Float64)
+            for d in (2,3)
+                ρ = randdm(T, d)
+                @test eltype(ρ) == Complex{T}
+                @test tr(ρ) ≈ one(T) rtol=1e-8
+                @test all( x-> x >= -1e-8, eigvals(ρ))
+
+                U = GuessworkQuantumSideInfo.randunitary(T, d)
+                @test eltype(U) == Complex{T}
+                @test U' * U ≈ I(d) atol=1e-6
+                @test U * U' ≈ I(d) atol=1e-6
+
+                k = ket(T, 1, d)
+                @test k' ≈ bra(T, 1, d) rtol=1e-8
+
+                p = randprobvec(T, d)
+                @test eltype(p) == T
+                @test sum(p) ≈ one(T) rtol=1e-8
+                @test all( x-> x >= -1e-8, p)
+            end
+
+            ρBs = BB84_states(T)
+            @test length(ρBs) == 4
+            @test Set(iid_copies(ρBs, 2)) == Set([ ρ ⊗ σ for ρ in ρBs for σ in ρBs])
+        end
+        
+        # Defaults
+        @test BB84_states() ≈ BB84_states(Float64)
+        @test BB84_states()  ≈ dm.([ketzero, ketone, ketminus, ketplus]) atol=1e-6
+
+        @test ket(1,2) ≈ ket(Float64, 1, 2)
+        @test bra(1, 2) ≈ bra(Float64, 1, 2)
+        @test eltype(randdm(2)) == Complex{Float64}
+        @test eltype(randprobvec(2)) == Float64
     end
 end

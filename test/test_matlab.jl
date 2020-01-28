@@ -1,3 +1,6 @@
+# Earlier versions of this code were tested, but I haven't been able to test the
+# latest version due to licensing issues.
+
 using MATLAB
 
 # Monkeypatch the MATLAB versions into the `GuessworkQuantumSideInfo` module
