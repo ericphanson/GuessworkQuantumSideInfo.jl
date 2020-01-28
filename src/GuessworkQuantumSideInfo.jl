@@ -6,8 +6,8 @@ using Convex # Julia SDP solvers / interfaces
 using Combinatorics: multiset_permutations, combinations # used for POVM outcomes
 using UnPack # helper
 
-# Basic functions for quantum states, and easily generating data objects for `guesswork` and `guesswork_lazy`
-export ketbra, ket, bra, ⊗, I, dm, randdm, randpure
+# Basic functions for quantum states and examples
+export ket, bra, ⊗, I, dm, randdm, randprobvec, iid_copies, BB84_states
 include("quantum_states.jl")
 
 # The basic SDP routine

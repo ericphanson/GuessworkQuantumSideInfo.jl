@@ -1,3 +1,5 @@
+# Examples
+
 Let's load the package, an SDP solver, and define a simple plotting routine.
 ```@example ex
 using GuessworkQuantumSideInfo
@@ -96,8 +98,7 @@ Let us consider two tensor copies of the BB84 states:
 
 ```@repl ex
 p = ones(16)/16
-bb84 = GuessworkQuantumSideInfo.BB84_states()
-ρBs = GuessworkQuantumSideInfo.iid_copies(bb84, 2)
+ρBs = iid_copies(BB84_states(), 2)
 ```
 
 In this case, there are $16! = 20922789888000$ possible guessing orders, and
@@ -111,4 +112,23 @@ lb_output.optval
 
 ub_output = guesswork_upper_bound(p, ρBs; max_time = 30, make_solver = get_sdp_solver);
 ub_output.optval
+```
+
+## A closer look at `guesswork_upper_bound`
+
+We can understand [`guesswork_upper_bound`](@ref) better by setting
+`verbose=true`. The algorithm computes a sequence of upper bounds by relaxing
+the dual problem. First, it removes all constraints, and chooses the dual
+variable $Y$ as the identity matrix. Then it uses a simulated annealing
+algorithm to heuristically minimize $\lambda_\text{min}(R_{\vec g} - Y)$ over
+the possible guessing orders $\vec g$ (which are permutations), to find a
+constraint that is "maximally" violated by this choice of $Y$. Then we add the
+corresponding constraint $Y \leq R_{\vec g}$ to the dual problem and solve it
+again. This is repeated until either a fixed number of constraints is added,
+some number of simulated annealing runs fails to find another violated
+constraint, or a time limit is reached. In the following, we set a time limit of
+30 seconds.
+
+```@repl ex
+ub_output = guesswork_upper_bound(p, ρBs; verbose=true, max_time = 30, make_solver = get_sdp_solver);
 ```

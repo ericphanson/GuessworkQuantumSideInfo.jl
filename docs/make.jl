@@ -1,6 +1,8 @@
 using GuessworkQuantumSideInfo
 using Documenter
 
+DocMeta.setdocmeta!(GuessworkQuantumSideInfo, :DocTestSetup, :(using GuessworkQuantumSideInfo; using SparseArrays); recursive=true)
+
 previous_GKSwstype = get(ENV, "GKSwstype", "")
 ENV["GKSwstype"] = "100"
 
@@ -18,6 +20,7 @@ makedocs(;
         "Home" => "index.md",
         "Examples" => "examples.md",
         "High precision example" => "high-precision-example.md",
+        "Mixed-integer SDP example" => "mixed-integer-SDP.md",
     ],
 )
 

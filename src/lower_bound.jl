@@ -8,13 +8,10 @@
         verbose::Bool = false,
     )
 
-Computes a lower bound to the optimal expected number of guesses by relaxing the problem.
-For `J` states, only needs `J^2` PSD variables subject to two linear constraints.
-
-Gives e.g. `1.5` instead of `1.71` for BB84(1), and `2.5` for BB84(2), providing the current
-tightest lower bound to BB84(2) (we can get an upper bound of ~`3.7` via dual relaxations).
-Doesn't seem like a great lower bound, but it does seem to perform better on random inputs
-(e.g. giving `1.91` instead of `1.98` in a four random qubit example.)
+See [`guesswork`](@ref) for the meaning of the arguments. Computes a lower bound
+to the optimal expected number of guesses by solving a relaxed version of the
+primal SDP. For `J` states, only needs `J^2` PSD variables subject to two linear
+constraints.
 """
 function guesswork_lower_bound(
     p::AbstractVector{T},

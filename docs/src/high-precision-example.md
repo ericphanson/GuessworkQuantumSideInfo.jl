@@ -1,5 +1,13 @@
+# Computing the guesswork to high precision
 
-In order to solve the SDPs in high-precision, we need to start a new Julia session. That's because Pajarito, the library used for mixed-integer SDPs, and SDPAFamily, the one for high-precision SDPs, each require different versions of Convex.jl, the optimization problem modeling library. The following example was run locally and the output copied to the documentation. First, add the packages `Convex#master` (or just `Convex` once version 0.13 of that package is released) and `SDPAFamily`, and then the following code.
+In order to solve the SDP describing the guesswork in high-precision, we need to
+start a new Julia session. That's because Pajarito, the library used for
+mixed-integer SDPs, and SDPAFamily, the one for high-precision SDPs, each
+require different versions of Convex.jl, the optimization problem modeling
+library. The following example was run locally and the output copied to the
+documentation. First, add the packages `Convex#master` (or just `Convex` once
+version 0.13 of that package is released) and `SDPAFamily`, and then the
+following code.
 
 ```julia
 julia> setprecision(2000) # set Julia's global BigFloat precision to 2000
@@ -20,7 +28,7 @@ julia> using GuessworkQuantumSideInfo
 julia> T = BigFloat
 BigFloat
 
-julia> ρBs = GuessworkQuantumSideInfo.BB84_states(T);
+julia> ρBs = BB84_states(T);
 
 julia> p = ones(T, 4) / 4;
 
@@ -38,6 +46,10 @@ true
 
 ```
 
-Note that the output of the optimization solver matches `true_val` up to an error of at most $10^{-200}$.
+Note that the output of the optimization solver matches `true_val` up to an
+error of at most $10^{-200}$.
 
-See also <https://github.com/ericphanson/GuessworkQuantumSideInfo.jl/tree/master/test/high_precision_tests> for a folder with a reproducible environment for running this kind of high-precision code.
+See also
+<https://github.com/ericphanson/GuessworkQuantumSideInfo.jl/tree/master/test/high_precision_tests>
+for a folder with a reproducible environment for running this kind of
+high-precision code.
