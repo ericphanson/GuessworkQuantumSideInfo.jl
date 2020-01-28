@@ -9,7 +9,8 @@ TEST_MOI = false # incompatible with the current version of Pajarito
 
 @info "Beginning tests with" TEST_MATLAB TEST_MISDP TEST_BB84_MISDP TEST_MOI
 
-default_sdp_solver() = TEST_MOI ? SCS.Optimizer(verbose = 0) : SCSSolver(verbose = 0)
+default_sdp_solver() = TEST_MOI ? SCS.Optimizer(verbose = 0, eps = 1e-6) : SCSSolver(verbose = 0, eps = 1e-6)
+TOL = 1e-3
 
 if TEST_MISDP
     using Pajarito, Cbc
@@ -50,13 +51,13 @@ Random.seed!(5)
         output = test_optimize(p, ρBs, 1.5)
 
         pmf = pmfN(output)
-        @test pmf ≈ [0.5, 0.5] rtol = 1e-4
+        @test pmf ≈ [0.5, 0.5] rtol = TOL
 
         lb = guesswork_lower_bound(p, ρBs; solver = default_sdp_solver()).optval
-        @test lb <= output.optval + 1e-4
+        @test lb <= output.optval + TOL
 
         ub = guesswork_upper_bound(p, ρBs; num_constraints = 2^2 + 1, make_solver = default_sdp_solver).optval
-        @test output.optval <= ub + 1e-4
+        @test output.optval <= ub + TOL
 
     end
 
@@ -67,13 +68,13 @@ Random.seed!(5)
 
         pmf = pmfN(output)
 
-        @test pmf ≈ [1.0, 0.0] rtol = 1e-4
+        @test pmf ≈ [1.0, 0.0] rtol = TOL
 
         lb = guesswork_lower_bound(p, ρBs; solver = default_sdp_solver()).optval
-        @test lb <= output.optval + 1e-4
+        @test lb <= output.optval + TOL
 
         ub = guesswork_upper_bound(p, ρBs; num_constraints =  2^2 + 1, make_solver = default_sdp_solver).optval
-        @test output.optval <= ub + 1e-4
+        @test output.optval <= ub + TOL
     end
 
     @testset "Plus zero" begin
@@ -82,13 +83,13 @@ Random.seed!(5)
 
         output = test_optimize(p, ρBs, cos(π / 8)^2 + 2 * sin(π / 8)^2)
 
-        @test pmfN(output) ≈ [cos(π / 8)^2, sin(π / 8)^2] rtol = 1e-4
+        @test pmfN(output) ≈ [cos(π / 8)^2, sin(π / 8)^2] rtol = TOL
 
         lb = guesswork_lower_bound(p, ρBs; solver = default_sdp_solver()).optval
-        @test lb <= output.optval + 1e-4
+        @test lb <= output.optval + TOL
 
         ub = guesswork_upper_bound(p, ρBs; num_constraints =  2^2 + 1, make_solver = default_sdp_solver).optval
-        @test output.optval <= ub + 1e-4
+        @test output.optval <= ub + TOL
     end
 
     @testset "Three random qubits" begin
@@ -98,10 +99,10 @@ Random.seed!(5)
         output = test_optimize(p, ρBs; test_MISDP = false)
 
         lb = guesswork_lower_bound(p, ρBs; solver = default_sdp_solver()).optval
-        @test lb <= output.optval + 1e-4
+        @test lb <= output.optval + TOL
 
         ub = guesswork_upper_bound(p, ρBs; num_constraints =  2^2 + 1, make_solver = default_sdp_solver).optval
-        @test output.optval <= ub + 1e-4
+        @test output.optval <= ub + TOL
     end
 
     @testset "Three random qutrits" begin
@@ -110,10 +111,10 @@ Random.seed!(5)
 
         output = test_optimize(p, ρBs; test_MISDP = false)
         lb = guesswork_lower_bound(p, ρBs; solver = default_sdp_solver()).optval
-        @test lb <= output.optval + 1e-4
+        @test lb <= output.optval + TOL
 
         ub = guesswork_upper_bound(p, ρBs; num_constraints =  3^2 + 1, make_solver = default_sdp_solver).optval
-        @test output.optval <= ub + 1e-4
+        @test output.optval <= ub + TOL
     end
 
 
@@ -125,10 +126,10 @@ Random.seed!(5)
         output = test_optimize(p, ρBs; test_MISDP = false)
 
         lb = guesswork_lower_bound(p, ρBs; solver = default_sdp_solver()).optval
-        @test lb <= output.optval + 1e-4
+        @test lb <= output.optval + TOL
 
         ub = guesswork_upper_bound(p, ρBs; num_constraints =  2^2 + 1, make_solver = default_sdp_solver).optval
-        @test output.optval <= ub + 1e-4
+        @test output.optval <= ub + TOL
     end
 
     @testset "BB84" begin
@@ -147,15 +148,15 @@ Random.seed!(5)
             output_MISDP, t, _ = @timed guesswork_MISDP(p, ρBs, 2; solver = misdp_solver())
             @info "Finished BB84 MISDP in $(round(t;digits=3)) seconds."
             testPOVM(output_MISDP.Es)
-            @test output_MISDP.optval ≈ output.optval rtol = 1e-4
+            @test output_MISDP.optval ≈ output.optval rtol = TOL
         end
 
         relaxed_output = guesswork_upper_bound(p, ρBs; num_constraints = 4, make_solver = default_sdp_solver)
 
-        @test output.optval ≈ relaxed_output.optval rtol = 1e-4
+        @test output.optval ≈ relaxed_output.optval rtol = TOL
 
         lb = guesswork_lower_bound(p, ρBs; solver = default_sdp_solver()).optval
-        @test lb <= output.optval + 1e-4
+        @test lb <= output.optval + TOL
 
     end
 
@@ -171,10 +172,10 @@ Random.seed!(5)
         p = ones(J) / J
         output = test_optimize(p, ρBs; test_MISDP = false)
         lb = guesswork_lower_bound(p, ρBs; solver = default_sdp_solver()).optval
-        @test lb <= output.optval + 1e-4
+        @test lb <= output.optval + TOL
 
         ub = guesswork_upper_bound(p, ρBs; num_constraints =  2^2 + 1, make_solver = default_sdp_solver).optval
-        @test output.optval <= ub + 1e-4
+        @test output.optval <= ub + TOL
     end
 
     @testset "Upper bound" begin
@@ -203,6 +204,6 @@ Random.seed!(5)
         g_avg = guesswork(p, ρBs; solver = default_sdp_solver()).optval
         g_1 = guesswork(p_1, ρBs_1; solver = default_sdp_solver()).optval
         g_2 = guesswork(p_2, ρBs_2; solver = default_sdp_solver()).optval
-        @test 1e-4 + g_avg >= λ*g_1 + (1-λ)*g_2
+        @test TOL + g_avg >= λ*g_1 + (1-λ)*g_2
     end
 end
