@@ -194,7 +194,7 @@ function _loop(
         projected_time = total_time_so_far + 1.1*(SA_time + solve_time)
         if projected_time > max_time
             if verbose
-                _log_time(total_time_so_far, total_time_so_far + SA_time + solve_time, max_time)
+                _log_time(total_time_so_far, projected_time, max_time)
             end
             break
         end
