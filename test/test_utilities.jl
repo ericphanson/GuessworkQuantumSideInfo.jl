@@ -117,7 +117,7 @@ function test_optimize(
     # some helpful information in case of test failure
     if !all_close_to_optimal
         @error "`test_optimize` failure" true_opt_val
-        for (i, test) in enunmerate(test_data)
+        for (i, test) in enumerate(test_data)
             @error "Solve $i results:" test
         end
     end
