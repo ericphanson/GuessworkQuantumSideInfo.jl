@@ -28,6 +28,7 @@ function test_misdp_objective_value(data)
 end
 
 
+get_SCS_solver() = TEST_MOI ? SCS.Optimizer(verbose = 0, eps = 1e-6) : SCSSolver(verbose = 0, eps = 1e-6)
 function test_optimize(
     p,
     ρBs,
@@ -41,7 +42,7 @@ function test_optimize(
     local current_output
     for dual in (true, false)
         for remove_repetition in (test_repetition ? (false, true) : (true,))
-            for (solver, solver_name) in ((SCSSolver(verbose = 0), :SCS),)
+            for (solver, solver_name) in ((get_SCS_solver(), :SCS),)
                 current_output = guesswork(p, ρBs; solver = solver, dual = dual, remove_repetition = remove_repetition, kwargs...)
                 push!(optvals, current_output.optval)
                 push!(

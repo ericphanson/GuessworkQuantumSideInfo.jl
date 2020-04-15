@@ -3,9 +3,9 @@ using GenericLinearAlgebra
 using SCS
 
 TEST_MATLAB = false # requires MATLAB and MATLAB.jl installed
-TEST_MISDP = true # requires Pajarito or another MISDP solver
+TEST_MISDP = false # requires Pajarito or another MISDP solver
 TEST_BB84_MISDP = false # takes ~100 seconds; requires TEST_MISDP
-TEST_MOI = false # incompatible with the current version of Pajarito
+TEST_MOI = true # incompatible with the current version of Pajarito
 
 @info "Beginning tests with" TEST_MATLAB TEST_MISDP TEST_BB84_MISDP TEST_MOI
 
@@ -204,11 +204,14 @@ Random.seed!(5)
         @test_throws ArgumentError guesswork_upper_bound(p, ρBs; num_constraints = Inf, max_time=Inf, max_retries = Inf, make_solver = default_sdp_solver)
         @test_logs (:info, r"Adding constraint") match_mode=:any guesswork_upper_bound(p, ρBs; verbose=true, make_solver = default_sdp_solver, max_time = 2)
 
-        @test_logs (:info, r"MISDP solve") match_mode=:any guesswork_MISDP(randprobvec(2), [randdm(2) for _ = 1:2], 5; verbose=true, solver = misdp_solver())
-
         two_states = [randdm(2) for _ = 1:2]
         p_3 = randprobvec(3)
-        @test_throws ArgumentError guesswork_MISDP(p_3, two_states, 5; solver = misdp_solver())
+
+        if TEST_MISDP
+            @test_logs (:info, r"MISDP solve") match_mode=:any guesswork_MISDP(randprobvec(2), [randdm(2) for _ = 1:2], 5; verbose=true, solver = misdp_solver())
+            @test_throws ArgumentError guesswork_MISDP(p_3, two_states, 5; solver = misdp_solver())
+        end
+        
         @test_throws ArgumentError guesswork(p_3, two_states; solver = default_sdp_solver())
         @test_throws ArgumentError guesswork_lower_bound(p_3, two_states; solver = default_sdp_solver())
         @test_throws ArgumentError guesswork_upper_bound(p_3, two_states; make_solver = default_sdp_solver)
