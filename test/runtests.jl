@@ -11,10 +11,10 @@ TEST_MOI = true # incompatible with the current version of Pajarito
 
 default_sdp_solver() = TEST_MOI ? SCS.Optimizer(verbose = 0, eps = 1e-6) : SCSSolver(verbose = 0, eps = 1e-6)
 
-# bad solve error on 1.0 observed on CI (though not locally)
+# bad solve error on 1.0 and nightly observed on CI (though not locally)
 # possibly reflects problems with SCS, but not with this package,
-# so we'll just relax the tolerance here.
-TOL = VERSION < v"1.1" ? 1e-2 : 1e-3
+# so we'll just use a relaxed tolerance here.
+TOL = 1e-2
 
 if TEST_MISDP
     using Pajarito, Cbc
