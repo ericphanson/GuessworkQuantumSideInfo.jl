@@ -40,6 +40,15 @@ function find_violation(prob::EllipsoidProblem{T}, Y) where {T}
     @unpack c, p, dB, ρBs, max_retries, num_steps_per_SA_run, mutate! = prob
     J = length(p)
 
+    # Easy check for feasibility:
+    # We want to know if `Y <= R(π)` for all
+    # permutations `π`. But since `R(π) >= ρB*c[1]` for any `π`,
+    # as a quick check we can see if `Y <= ρB*c[1]`.
+    ρB = sum(p[x]*ρBs[x] for x in eachindex(p))
+    if eigmin(Hermitian(c[1]*ρB - Y)) >= 0
+        return zero(Y)
+    end
+
     R = g -> sum(c[N(invperm(g), x)] * p[x] * ρBs[x] for x in eachindex(p, ρBs))
 
     # We optimize over the inverse of the permutations we are interested in
@@ -91,7 +100,6 @@ using LinearAlgebra
 const tol = Ref(1e-4)
 
 
-
 function ellipsoid_solve(f::EllipsoidProblem, x, P, ϵ)
     dB = f.dB
     n = length(x)
@@ -116,6 +124,7 @@ function ellipsoid_solve(f::EllipsoidProblem, x, P, ϵ)
 
         Pg̃ = P * g̃
         x = x - stepsize*Pg̃
+
         P = (n^2/(n^2-1)) *(P - (2*stepsize)* Pg̃ * transpose(Pg̃))
     end
 end
