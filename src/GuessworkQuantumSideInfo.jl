@@ -29,4 +29,7 @@ include("MISDP_formulation.jl")
 export pmfN
 include("analyze_measurements.jl")
 
+
+export ellipsoid_solve, make_ellipsoid_problem
+include("ellipsoid.jl")
 end
