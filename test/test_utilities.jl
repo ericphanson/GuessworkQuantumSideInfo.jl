@@ -40,6 +40,20 @@ function test_optimize(
     optvals = []
     test_data = []
     local current_output
+
+    if TEST_ELLIPSOID
+        current_output = guesswork_ellipsoid(p, ρBs; tol=1e-3, kwargs...)
+        push!(optvals, current_output.optval)
+        push!(
+            test_data,
+            (
+                opval = current_output.optval,
+                solver = :ellipsoid,
+                params = (tol=1e-3, kwargs...),
+            ),
+        )
+    end
+    
     for dual in (true, false)
         for remove_repetition in (test_repetition ? (false, true) : (true,))
             for (solver, solver_name) in ((get_SCS_solver(), :SCS),)

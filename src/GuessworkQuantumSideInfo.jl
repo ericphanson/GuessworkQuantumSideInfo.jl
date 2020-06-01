@@ -30,6 +30,6 @@ export pmfN
 include("analyze_measurements.jl")
 
 
-export ellipsoid_solve, make_ellipsoid_problem
+export guesswork_ellipsoid
 include("ellipsoid.jl")
 end

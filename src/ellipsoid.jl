@@ -1,40 +1,71 @@
-
-function make_ellipsoid_problem(p::AbstractVector{T}, ρBs::AbstractVector{<:AbstractMatrix}, c::AbstractVector = T.(1:length(p));
+function make_ellipsoid_problem(
+    p::AbstractVector{T},
+    ρBs::AbstractVector{<:AbstractMatrix};
+    c::AbstractVector = T.(1:length(p)),
     max_retries = 50,
     max_time = Inf,
     num_constraints = Inf,
     verbose::Bool = false,
     num_steps_per_SA_run::Integer = length(p)^2 * 500,
     mutate! = rand_rev!,
-    debug = false,) where {T}
+    debug = false,
+) where {T}
 
     length(p) == length(ρBs) ||
-    throw(ArgumentError("Length of prior and vector of side information must match J"))
+        throw(ArgumentError("Length of prior and vector of side information must match J"))
     J = length(p)
     dB = size(ρBs[1], 1)
     all(ρB -> size(ρB) == (dB, dB), ρBs) ||
-    throw(ArgumentError("All side-information states must be square matrices of the same size"))
+        throw(ArgumentError("All side-information states must be square matrices of the same size"))
 
     if (length(c) < length(p))
         throw(ArgumentError("Need `length(c) >= length(p)`."))
     end
 
-    EllipsoidProblem(p, ρBs, dB, c, max_retries, max_time, verbose, num_steps_per_SA_run, mutate!, debug)
+    EllipsoidProblem(
+        p,
+        ρBs,
+        dB,
+        c,
+        max_retries,
+        max_time,
+        verbose,
+        num_steps_per_SA_run,
+        mutate!,
+        debug,
+    )
 end
 
-struct EllipsoidProblem{T, TρBs, Tc, Tm}
+struct EllipsoidProblem{T,TρBs,Tc,Tm}
     p::Vector{T}
     ρBs::TρBs
     dB::Int
     c::Tc
     max_retries::Int
-    max_time::Float64 
+    max_time::Float64
     verbose::Bool
     num_steps_per_SA_run::Integer
     mutate!::Tm
-    debug::Bool 
+    debug::Bool
 end
 
+@enum FeasibilityStates FEASIBLE INFEASIBLE UNKNOWN
+
+function simplex_relaxation(prob::EllipsoidProblem{T}, Y) where {T}
+    @unpack c, p, ρBs = prob
+    J = length(p)
+    c_tot = sum(c)
+    c_max = c_tot - (J - 1) * c[1]
+    for x = 1:J
+        extremal_pt = p[x] * ρBs[x] * c_max + sum(p[y] * ρBs[y] * c[1] for y = 1:J if y ≠ x)
+        if eigmin(Hermitian(extremal_pt - Y)) < 0
+            # simplex relaxation is not feasible; discrete problem may or may not be
+            return UNKNOWN
+        end
+    end
+    # simplex relaxation is feasible, so discrete problem is too
+    return FEASIBLE
+end
 
 function find_violation(prob::EllipsoidProblem{T}, Y) where {T}
     @unpack c, p, dB, ρBs, max_retries, num_steps_per_SA_run, mutate! = prob
@@ -44,9 +75,14 @@ function find_violation(prob::EllipsoidProblem{T}, Y) where {T}
     # We want to know if `Y <= R(π)` for all
     # permutations `π`. But since `R(π) >= ρB*c[1]` for any `π`,
     # as a quick check we can see if `Y <= ρB*c[1]`.
-    ρB = sum(p[x]*ρBs[x] for x in eachindex(p))
-    if eigmin(Hermitian(c[1]*ρB - Y)) >= 0
-        return zero(Y)
+    ρB = sum(p[x] * ρBs[x] for x in eachindex(p))
+    if eigmin(Hermitian(c[1] * ρB - Y)) >= 0
+        return FEASIBLE, zero(Y)
+    end
+
+    # Strictly stronger check, but takes more time to compute (`J` eigmin's rather than 1)
+    if simplex_relaxation(prob, Y) == FEASIBLE
+        return FEASIBLE, zero(Y)
     end
 
     R = g -> sum(c[N(invperm(g), x)] * p[x] * ρBs[x] for x in eachindex(p, ρBs))
@@ -88,9 +124,11 @@ function find_violation(prob::EllipsoidProblem{T}, Y) where {T}
 
     if fval < 0
         new_constraint = copy(π)
-        return R(new_constraint) - Y
+        # found a cut, definitely infeasible
+        return INFEASIBLE, R(new_constraint) - Y
     else
-        return zero(Y)
+        # could not find a cut but also did not prove feasibility
+        return UNKNOWN, zero(Y)
     end
 end
 
@@ -99,33 +137,68 @@ end
 using LinearAlgebra
 const tol = Ref(1e-4)
 
+function default_init(f::EllipsoidProblem{T}) where T
+    @unpack p, ρBs, c, dB = f
+    ρB = sum(p[x] * ρBs[x] for x in eachindex(p))
+    Y_0 = c[1] * ρB
+    x_0 = invherm(Y_0)
+    
+    # In semidefinite order,
+    # 0 <= Y - Y_0 <= c[end]*I(dB^2) - Y_0
+    Y_bound = opnorm(c[end]*I(dB) - Y_0)
 
-function ellipsoid_solve(f::EllipsoidProblem, x, P, ϵ)
+    # Hence `||Y-Y_0||_2 <= dB^2 * ||Y - Y_0||_∞ = dB^2*Y_bound`
+    P_0 = Y_bound * dB^2 * Matrix{T}(I, dB^2, dB^2)
+
+    return (x = x_0, P = P_0)
+end
+
+function guesswork_ellipsoid(p, ρBs; tol=1e-3, kwargs...)
+    prob = make_ellipsoid_problem(p, ρBs; kwargs...)
+    results = ellipsoid_algorithm(prob; ϵ=tol, default_init(prob)...)
+    (optval = tr(results.Y), Y = results.Y, p = p, ρBs = ρBs, c = prob.c, J = length(p), K = length(p))
+end
+
+using SpecialFunctions
+function unit_ball_volume(n)
+    π^(n/2) / gamma(n/2 + 1)
+end
+
+
+function ellipsoid_algorithm(
+    f::EllipsoidProblem{T};
+    x,
+    P,
+    ϵ,
+) where {T}
     dB = f.dB
     n = length(x)
-    stepsize = inv(n+1)
+    stepsize = inv(n + 1)
     iter = 0
     f_best = Inf
     l_best = -Inf
-
+    vol0 = unit_ball_volume(n)
     while true
         iter += 1
         g, fval, feasible = subgradient(f, x)
         γ = sqrt(dot(g, P, g))
-        @info "Iteration" iter γ fval f_best l_best
+        if f.verbose
+            vol = vol0 * sqrt(det(P))
+            @info "Iteration" iter vol γ fval f_best l_best
+        end
         fval = real(fval)
         γ = real(γ)
         if feasible
             f_best = min(f_best, fval)
             l_best = max(l_best, fval - γ)
         end
-        feasible && γ ≤ ϵ && return (x=x, P=P, Y = herm(x))
-        g̃ = (1/γ)*g
+        feasible && γ ≤ ϵ && return (x = x, P = P, Y = herm(x))
+        g̃ = (1 / γ) * g
 
         Pg̃ = P * g̃
-        x = x - stepsize*Pg̃
+        x = x - stepsize * Pg̃
 
-        P = (n^2/(n^2-1)) *(P - (2*stepsize)* Pg̃ * transpose(Pg̃))
+        P = (n^2 / (n^2 - 1)) * (P - (2 * stepsize) * Pg̃ * transpose(Pg̃))
     end
 end
 
@@ -152,58 +225,80 @@ function subgradient(f::EllipsoidProblem, x)
     dB = f.dB
     Y = herm(x)
     if !(Y ≈ Y')
-        @show Y - Y'
-        error()
+        f.verbose && @show Y - Y'
+        error("`Y` not Hermitian")
     end
-    V = find_violation(f, Y)
+    state, V = find_violation(f, Y)
+    if f.verbose
+        @info state
+    end
     if V != zero(V)
         elt = normal_cone_element(PSD(), V)
-        @info "Found violation" V
-        @info "" eigvals(V)
-        @info "" elt
-        @info "" eigvals(elt)
+        # if f.verbose
+        #     @info "Found violation" V
+        #     @info "" eigvals(V)
+        #     @info "" elt
+        #     @info "" eigvals(elt)
+        # end
         return -invherm(elt), Inf, false
     else
         return invherm(-I(dB)), -tr(Y), true
     end
-    
+
 end
 
 
-
-# helper for `herm`
-function f(x, y, i, j)
-    if i == j
-        return x/2 + im*zero(y)
-    elseif i > j
-        return x + im * y
-    elseif i < j
-        return zero(x) + im*zero(y)
+# We use the following basis for the Hermitian matrices
+# of dimension `d`, ℍ_d:
+# { E_jj for j = 1:d }
+#   ∪ { (E_{jk} + E_{kj})/sqrt(2) for 1 ≤ j < k ≤ d }
+#   ∪ { (E_{jk} - E_{kj})/sqrt(2) for 1 ≤ j < k ≤ d }
+# where `E_{jk}` is the matrix with a 1 in the (j,k) position
+# and zero elsewhere.
+# This basis has the advantage that the induced map from ℝ^{d^2} to ℍ_d
+# is an isometry w/r/t/ the 2-norm on ℝ^{d^2} and the 2-norm (Frobenius norm) on ℍ_d.
+# This implies in particular that if ||Y* - Y_0||_∞ <= x
+# then `||x* - x_0||_2 = ||Y^* - Y_0||_2 <= d^2 ||Y* - Y_0||_∞ <= d^2 x`
+# By choosing `Y_0 = 0`, using `0 <= Y^* <= c[end]*I`, we find `x=c`.
+# Thus, we may take P_0 = d^2 c * I.
+function invherm(M::AbstractMatrix)
+    d = size(M, 1)
+    @assert size(M) == (d, d)
+    v = zeros(real(eltype(M)), d^2)
+    sqrt2 = sqrt(eltype(v)(2))
+    c = 0
+    for i = 1:d
+        c += 1
+        v[c] = real(M[i, i])
     end
-end
-
-# helper for invherm
-function finv(z, i, j)
-    if i <= j
-        return real(z)
-    elseif i > j
-        return imag(z)
+    for k = 1:d
+        for j = 1:k-1
+            c += 1
+            v[c] = sqrt2 * real(M[j, k])
+            c += 1
+            v[c] = sqrt2 * imag(M[j, k])
+        end
     end
+    return v
 end
 
-# Create a complex `d` by `d` Hermitian matrix from a `d^2`-dimensional real vector `v`
 function herm(v::AbstractVector)
     d = isqrt(length(v))
     @assert d^2 == length(v)
-    m = reshape(v, d, d)
-    m = [ f(m[i,j], m[j,i], i, j) for i = 1:d, j = 1:d]
-    m = m + m'
-    return m
-end
-
-# Recover the vector representation
-function invherm(A::AbstractMatrix)
-    d = size(A,1)
-    m = [ finv(A[i,j], i, j) for i = 1:d for j = 1:d ]
-    return vec(m)
+    M = zeros(complex(eltype(v)), d, d)
+    sqrt2 = sqrt(eltype(M)(2))
+    c = 0
+    for i = 1:d
+        c += 1
+        M[i, i] = v[c]
+    end
+    for k = 1:d
+        for j = 1:k-1
+            c += 1
+            M[j, k] = v[c] / sqrt2
+            c += 1
+            M[j, k] += im * v[c] / sqrt2
+        end
+    end
+    return Hermitian(M)
 end

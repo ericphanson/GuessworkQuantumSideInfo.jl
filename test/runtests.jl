@@ -1,13 +1,15 @@
 using Test, GuessworkQuantumSideInfo, LinearAlgebra, Statistics, Random, UnPack
 using GenericLinearAlgebra
 using SCS
+using GuessworkQuantumSideInfo: herm, invherm
 
 TEST_MATLAB = false # requires MATLAB and MATLAB.jl installed
 TEST_MISDP = false # requires Pajarito or another MISDP solver
 TEST_BB84_MISDP = false # takes ~100 seconds; requires TEST_MISDP
 TEST_MOI = true # incompatible with the current version of Pajarito
+TEST_ELLIPSOID = false # does not pass yet since currently a heuristic
 
-@info "Beginning tests with" TEST_MATLAB TEST_MISDP TEST_BB84_MISDP TEST_MOI
+@info "Beginning tests with" TEST_MATLAB TEST_MISDP TEST_BB84_MISDP TEST_MOI TEST_ELLIPSOID
 
 default_sdp_solver() = TEST_MOI ? SCS.Optimizer(verbose = 0, eps = 1e-6) : SCSSolver(verbose = 0, eps = 1e-6)
 
@@ -48,6 +50,36 @@ ketone = ket(2, dB)
 Random.seed!(5)
 
 @testset "GuessworkQuantumSideInfo.jl" begin
+
+    @testset "Hermitian basis" begin
+        for T in (Float64, BigFloat)
+            for d in (2,3,5)
+                v = rand(T, d^2) - rand(T, d^2)
+                M = herm(v)
+                # Isometry
+                @test norm(v, 2) ≈ norm(M, 2)
+                # Maps to Hermitian
+                @test M isa Hermitian
+                # Roundtrips
+                @test v ≈ invherm(M)
+                # Linear
+                v2 = rand(T, d^2) - rand(T, d^2)
+                λ = rand(T) - rand(T)
+                @test herm(v + λ*v2) ≈ herm(v) + λ*herm(v2)
+
+                # Test the other direction
+                M = Hermitian(rand(T, d,d) - rand(T, d, d) + im*( rand(T, d,d) - rand(T, d, d)))
+                v = invherm(M)
+                @test norm(M, 2) ≈ norm(v,2)
+                @test eltype(v) <: Real
+                @test v isa AbstractVector
+                @test M ≈ herm(v)
+                M2 = Hermitian(rand(T, d,d) - rand(T, d, d) + im*( rand(T, d,d) - rand(T, d, d)))
+                λ = rand(T) - rand(T)
+                @test invherm(M + λ*M2) ≈ invherm(M) + λ*invherm(M2)
+            end
+        end
+    end
 
     @testset "Uninformative side information" begin
         ρBs = dm.([ketzero, ketzero])
