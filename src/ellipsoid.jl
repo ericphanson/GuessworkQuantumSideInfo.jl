@@ -1,6 +1,59 @@
+using Logging, JuMP, EAGO, MathOptInterface
+const MOI = MathOptInterface
+using TimerOutputs
+
+function default_init(p, ρBs, c, dB, init_noise) 
+    T = eltype(p)
+    ρB = sum(p[x] * ρBs[x] for x in eachindex(p))
+
+    Y_0 = c[1] * ρB
+    x_0 = invherm(Y_0)
+
+    # In semidefinite order,
+    # 0 <= Y - Y_0 <= c[end]*I(dB^2) - Y_0
+    Y_bound = opnorm(c[end]*I(dB) - Y_0)
+
+    noise = randn(dB^2)
+    noise = init_noise * noise ./ norm(noise)
+
+    # Hence `||Y-Y_0||_2 <= dB^2 * ||Y - Y_0||_∞ = dB^2*Y_bound`
+    # Hence `||Y-Y_0 - noise||_2 <= init_noise + ||Y-Y_0||_2 <= init_noise +  dB^2*Y_bound`
+    P_0 = (init_noise + Y_bound * dB^2) * Matrix{T}(I, dB^2, dB^2)
+
+    return (x = x_0 + noise, P = P_0)
+end
+
+function guesswork_ellipsoid(p, ρBs; kwargs...)
+    prob = make_ellipsoid_problem(p, ρBs; kwargs...)
+    results = ellipsoid_algorithm!(prob)
+    (optval = tr(results.Y), p = p, ρBs = ρBs, c = prob.c, J = length(p), K = length(p), prob=prob, results...)
+end
+
+
+Base.@kwdef struct EllipsoidProblem{T1,T,TρBs,Tc,Tm,TT,L, LS, TTimer}
+    x::Vector{T1}
+    P::Matrix{T1}
+    p::Vector{T}
+    ρBs::TρBs
+    dB::Int
+    c::Tc
+    max_retries::Int
+    max_time::Float64
+    verbose::Bool
+    num_steps_per_SA_run::Integer
+    mutate!::Tm
+    debug::Bool
+    trace::Bool
+    tol::TT
+    logger::L
+    linear_solver::LS
+    timer::TTimer
+end
+
 function make_ellipsoid_problem(
     p::AbstractVector{T},
     ρBs::AbstractVector{<:AbstractMatrix};
+    linear_solver,
     c::AbstractVector = T.(1:length(p)),
     max_retries = 50,
     max_time = Inf,
@@ -9,6 +62,13 @@ function make_ellipsoid_problem(
     num_steps_per_SA_run::Integer = length(p)^2 * 500,
     mutate! = rand_rev!,
     debug = false,
+    trace = true,
+    x = nothing,
+    P = nothing,
+    tol = 1e-3,
+    init_noise = 1e-4,
+    logger = ConsoleLogger(),
+    timer = TimerOutput(),
 ) where {T}
 
     length(p) == length(ρBs) ||
@@ -22,68 +82,117 @@ function make_ellipsoid_problem(
         throw(ArgumentError("Need `length(c) >= length(p)`."))
     end
 
-    EllipsoidProblem(
-        p,
-        ρBs,
-        dB,
-        c,
-        max_retries,
-        max_time,
-        verbose,
-        num_steps_per_SA_run,
-        mutate!,
-        debug,
+    if x === nothing || P === nothing
+        @unpack x, P = default_init(p, ρBs, c, dB, init_noise) 
+    end
+
+    return EllipsoidProblem(
+        x=x,
+        P=P,
+        p=p,
+        ρBs=ρBs,
+        dB=dB,
+        c=c,
+        max_retries=max_retries,
+        max_time=max_time,
+        verbose=verbose,
+        num_steps_per_SA_run=num_steps_per_SA_run,
+        mutate! = mutate!,
+        debug = debug,
+        trace = trace,
+        tol = Ref(tol),
+        logger = logger,
+        linear_solver=linear_solver,
+        timer=timer
     )
 end
 
-struct EllipsoidProblem{T,TρBs,Tc,Tm}
-    p::Vector{T}
-    ρBs::TρBs
-    dB::Int
-    c::Tc
-    max_retries::Int
-    max_time::Float64
-    verbose::Bool
-    num_steps_per_SA_run::Integer
-    mutate!::Tm
-    debug::Bool
-end
 
 @enum FeasibilityStates FEASIBLE INFEASIBLE UNKNOWN
 
 function simplex_relaxation(prob::EllipsoidProblem{T}, Y) where {T}
-    @unpack c, p, ρBs = prob
+    @unpack c, p, ρBs, logger = prob
     J = length(p)
     c_tot = sum(c)
     c_max = c_tot - (J - 1) * c[1]
     for x = 1:J
         extremal_pt = p[x] * ρBs[x] * c_max + sum(p[y] * ρBs[y] * c[1] for y = 1:J if y ≠ x)
-        if eigmin(Hermitian(extremal_pt - Y)) < 0
+        e = eigmin(Hermitian(extremal_pt - Y))
+        if e < 0
             # simplex relaxation is not feasible; discrete problem may or may not be
+            with_logger(logger) do
+                state = UNKNOWN
+                @info "simplex_relaxation" state
+            end
             return UNKNOWN
         end
+    end
+    with_logger(logger) do
+        state = FEASIBLE
+        @info "simplex_relaxation" state
     end
     # simplex relaxation is feasible, so discrete problem is too
     return FEASIBLE
 end
 
-function find_violation(prob::EllipsoidProblem{T}, Y) where {T}
-    @unpack c, p, dB, ρBs, max_retries, num_steps_per_SA_run, mutate! = prob
+include("permutations.jl")
+
+function true_feasiblity(prob, Y)
+    # only real case for now
+    @unpack p, ρBs, c, dB, logger, linear_solver, timer = prob
+    @timeit timer "formulation" begin
+        J = length(p)
+        A_re = real.(ρBs) .* p
+        A_im = imag.(ρBs) .* p
+        Y_re = real.(Y)
+        Y_im = imag.(Y)
+        m = Model(with_optimizer(() -> EAGO.Optimizer(verbosity=0)))
+        @variable(m, 0 <= D[i=1:J,j=1:J] <= 1)
+        @constraint(m, sum(D, dims = 1) .== 1)
+        @constraint(m, sum(D, dims = 2) .== 1)
+        @variable(m, -1 <= ψ_re[i=1:dB] <= 1)
+        @variable(m, -1 <= ψ_im[i=1:dB] <= 1)
+
+        @NLexpression(m, R_re[l=1:dB,k=1:dB], sum(c[j]*A_re[i][l,k]*D[i,j] for j = 1:J, i = 1:J))
+        @NLexpression(m, R_im[l=1:dB,k=1:dB], sum(c[j]*A_im[i][l,k]*D[i,j] for j = 1:J, i = 1:J))
+        @NLexpression(m, t1, sum(ψ_re[l] * R_re[l,k] * ψ_re[k] - ψ_re[l] * R_im[l,k] * ψ_im[k] + ψ_im[l]*R_im[l,k] *ψ_re[k] + ψ_im[l] * R_re[l,k]*ψ_im[k] for l = 1:dB, k = 1:dB))
+        @NLexpression(m, t2, sum(ψ_re[l] * Y_re[l,k] * ψ_re[k] - ψ_re[l] * Y_im[l,k] * ψ_im[k] + ψ_im[l]*Y_im[l,k] *ψ_re[k] + ψ_im[l] * Y_re[l,k]*ψ_im[k] for l = 1:dB, k = 1:dB))
+        @NLobjective(m, Min, t1 - t2)
+    end
+    @timeit timer "optimize!" JuMP.optimize!(m)
+    @assert termination_status(m) == MOI.OPTIMAL
+
+    
+    obj_value = objective_value(m)
+    status = obj_value >= 0 ? FEASIBLE : INFEASIBLE
+    with_logger(logger) do
+        @info "true_feasiblity" obj_value status
+    end
+    if objective_value(m) >= 0
+        return FEASIBLE, zero(Y)
+    else
+
+        PI = PermutationIterator(D=value.(D), solver = linear_solver)
+        perm_iter = 0
+        for P in PI
+            perm_iter += 1
+            R = sum( (P*c)[x] * p[x] * ρBs[x] for x in eachindex(p, ρBs))
+            RY = Hermitian(R - Y)
+            eigmin_RY = eigmin(RY)
+            with_logger(logger) do
+                @info "true_feasiblity" perm_iter eigmin_RY
+            end
+            if eigmin_RY < 0
+                return INFEASIBLE, RY
+            end
+        end
+        error("Could not find cut yet somehow infeasible")
+    end
+end    
+
+function SA_find_cut(prob::EllipsoidProblem{T}, Y) where {T}
+    @unpack c, p, dB, ρBs, max_retries, num_steps_per_SA_run, mutate!, logger, timer = prob
     J = length(p)
-
-    # Easy check for feasibility:
-    # We want to know if `Y <= R(π)` for all
-    # permutations `π`. But since `R(π) >= ρB*c[1]` for any `π`,
-    # as a quick check we can see if `Y <= ρB*c[1]`.
-    ρB = sum(p[x] * ρBs[x] for x in eachindex(p))
-    if eigmin(Hermitian(c[1] * ρB - Y)) >= 0
-        return FEASIBLE, zero(Y)
-    end
-
-    # Strictly stronger check, but takes more time to compute (`J` eigmin's rather than 1)
-    if simplex_relaxation(prob, Y) == FEASIBLE
-        return FEASIBLE, zero(Y)
-    end
 
     R = g -> sum(c[N(invperm(g), x)] * p[x] * ρBs[x] for x in eachindex(p, ρBs))
 
@@ -115,21 +224,70 @@ function find_violation(prob::EllipsoidProblem{T}, Y) where {T}
     # Choose `fval` as something `> 0` to enter the loop.
     fval::T = 1.0
     n_tries::Int = 0
-    SA_time = @elapsed while fval > 0 && n_tries < max_retries
-        n_tries += 1
-        # initialize `π` to hold a random permutation, then use the simulated annealing algorithm to try to minimize `f`, starting from this permutation. Repeat until we find a violated constraint, or we've tried enough times.
-        randperm!(π)
-        fval = SA!(π, scratch_π, f, mutate!, num_steps_per_SA_run)
+    @timeit timer "SA" begin
+        while fval > 0 && n_tries < max_retries
+            n_tries += 1
+            # initialize `π` to hold a random permutation, then use the simulated annealing algorithm to try to minimize `f`, starting from this permutation. Repeat until we find a violated constraint, or we've tried enough times.
+            randperm!(π)
+            fval = SA!(π, scratch_π, f, mutate!, num_steps_per_SA_run)
+        end
+    end
+
+    with_logger(logger) do
+        @info "SA_find_cut" n_tries fval
     end
 
     if fval < 0
-        new_constraint = copy(π)
         # found a cut, definitely infeasible
-        return INFEASIBLE, R(new_constraint) - Y
+        return INFEASIBLE, R(π) - Y
     else
-        # could not find a cut but also did not prove feasibility
+        # Could not find a cut, inconclusive
         return UNKNOWN, zero(Y)
     end
+end
+
+
+function find_violation(prob::EllipsoidProblem{T}, Y) where {T}
+    @unpack c, p, ρBs, logger, timer = prob
+    J = length(p)
+
+    # Easy check for feasibility:
+    # We want to know if `Y <= R(π)` for all
+    # permutations `π`. But since `R(π) >= ρB*c[1]` for any `π`,
+    # as a quick check we can see if `Y <= ρB*c[1]`.
+    ρB = sum(p[x] * ρBs[x] for x in eachindex(p))
+    @timeit timer "easycheck" begin
+        eigmin_easycheck = eigmin(Hermitian(c[1] * ρB - Y))
+    end
+    with_logger(logger) do
+        @info "easycheck" eigmin_easycheck
+    end
+    if eigmin_easycheck >= 0
+        return FEASIBLE, zero(Y)
+    end
+
+    # Strictly stronger check, but takes more time to compute (`J` eigmin's rather than 1)
+    @timeit timer "simplex_relaxation" begin
+        state = simplex_relaxation(prob, Y)
+    end
+    if state == FEASIBLE
+        return FEASIBLE, zero(Y)
+    end
+
+    # Now try to find a cut via simulated annealing
+    @timeit timer "SA_find_cut" begin
+        state, V = SA_find_cut(prob, Y)
+    end
+    if state == INFEASIBLE
+        return state, V
+    end
+    
+    # last resort: globally solve a nonlinear problem
+    @timeit timer "true_feasiblity" begin
+        result = true_feasiblity(prob, Y)
+    end
+
+    return result
 end
 
 
@@ -137,68 +295,88 @@ end
 using LinearAlgebra
 const tol = Ref(1e-4)
 
-function default_init(f::EllipsoidProblem{T}) where T
-    @unpack p, ρBs, c, dB = f
-    ρB = sum(p[x] * ρBs[x] for x in eachindex(p))
-    Y_0 = c[1] * ρB
-    x_0 = invherm(Y_0)
-    
-    # In semidefinite order,
-    # 0 <= Y - Y_0 <= c[end]*I(dB^2) - Y_0
-    Y_bound = opnorm(c[end]*I(dB) - Y_0)
-
-    # Hence `||Y-Y_0||_2 <= dB^2 * ||Y - Y_0||_∞ = dB^2*Y_bound`
-    P_0 = Y_bound * dB^2 * Matrix{T}(I, dB^2, dB^2)
-
-    return (x = x_0, P = P_0)
-end
-
-function guesswork_ellipsoid(p, ρBs; tol=1e-3, kwargs...)
-    prob = make_ellipsoid_problem(p, ρBs; kwargs...)
-    results = ellipsoid_algorithm(prob; ϵ=tol, default_init(prob)...)
-    (optval = tr(results.Y), Y = results.Y, p = p, ρBs = ρBs, c = prob.c, J = length(p), K = length(p))
-end
-
 using SpecialFunctions
 function unit_ball_volume(n)
     π^(n/2) / gamma(n/2 + 1)
 end
 
-
-function ellipsoid_algorithm(
+using Dates
+function ellipsoid_algorithm!(
     f::EllipsoidProblem{T};
-    x,
-    P,
-    ϵ,
+
 ) where {T}
+    @unpack dB, x, P, logger, timer = f
+    t_log = now()
+    ϵ = f.tol[]
     dB = f.dB
     n = length(x)
-    stepsize = inv(n + 1)
     iter = 0
     f_best = Inf
     l_best = -Inf
     vol0 = unit_ball_volume(n)
+    x_best = copy(x)
+    log_interval = Millisecond(1)*1e4
     while true
+        @timeit timer "Display timer" begin
+            if now() - t_log >= log_interval
+                t_log = now()
+                @show timer
+            end
+        end
+
+        @timeit timer "yield" yield()
         iter += 1
-        g, fval, feasible = subgradient(f, x)
-        γ = sqrt(dot(g, P, g))
-        if f.verbose
+        @timeit timer "find_violation" begin
+            state, V = find_violation(f, herm(x))
+        end
+        feasible = state == FEASIBLE
+        if !feasible
+            # Constraint cut
+            g = -invherm(normal_cone_element(PSD(), V))
+            γ = sqrt(dot(g, P, g))
+            constraint_violation = -eigmin(V)
+            # α = min(constraint_violation / γ, .5)
+            α = 0
+            with_logger(logger) do
+                @info "constraint cut" γ g constraint_violation α
+            end
+        else
+            # objective cut
+            g = invherm(-I(dB))
+            γ = sqrt(dot(g, P, g))
+            f_val = -tr(herm(x))
+            if f_best > f_val
+                f_best = f_val
+                x_best .= x
+            end
+            α = (f_val - f_best) / γ
+            α = 0
+            with_logger(logger) do
+                @info "objective cut" γ g f_val α
+            end
+        end
+        
+        with_logger(logger) do
             vol = vol0 * sqrt(det(P))
-            @info "Iteration" iter vol γ fval f_best l_best
+            if !feasible
+                f_val = 0
+            end
+            @info "Iteration" iter vol γ feasible f_val f_best
         end
-        fval = real(fval)
-        γ = real(γ)
-        if feasible
-            f_best = min(f_best, fval)
-            l_best = max(l_best, fval - γ)
+
+        feasible && γ ≤ ϵ && return (x = x, P = P, Y = herm(x_best), x_best = x_best)
+
+        # Update ellipsoid center
+        @timeit timer "update center" begin
+            g̃ = (1 / γ) * g
+            Pg̃ = P * g̃
+            x .= x - (1 + n*α)*inv(n + 1) * Pg̃
         end
-        feasible && γ ≤ ϵ && return (x = x, P = P, Y = herm(x))
-        g̃ = (1 / γ) * g
 
-        Pg̃ = P * g̃
-        x = x - stepsize * Pg̃
-
-        P = (n^2 / (n^2 - 1)) * (P - (2 * stepsize) * Pg̃ * transpose(Pg̃))
+        # Update ellipsoid shape
+        @timeit timer "update shape" begin
+            P .= (n^2 / (n^2 - 1)) * (1 - α^2)*(P - 2*(1 + n*α) / ((n+1)*(1+α)) * Pg̃ * transpose(Pg̃))
+        end
     end
 end
 
@@ -218,33 +396,6 @@ end
 function normal_cone_element(::PSD, P)
     λ, Q = eigen(P)
     Q * Diagonal(normal_cone_element(Orth(), λ)) * Q'
-end
-
-
-function subgradient(f::EllipsoidProblem, x)
-    dB = f.dB
-    Y = herm(x)
-    if !(Y ≈ Y')
-        f.verbose && @show Y - Y'
-        error("`Y` not Hermitian")
-    end
-    state, V = find_violation(f, Y)
-    if f.verbose
-        @info state
-    end
-    if V != zero(V)
-        elt = normal_cone_element(PSD(), V)
-        # if f.verbose
-        #     @info "Found violation" V
-        #     @info "" eigvals(V)
-        #     @info "" elt
-        #     @info "" eigvals(elt)
-        # end
-        return -invherm(elt), Inf, false
-    else
-        return invherm(-I(dB)), -tr(Y), true
-    end
-
 end
 
 
