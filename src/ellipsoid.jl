@@ -1,4 +1,4 @@
-using Logging, JuMP, EAGO, MathOptInterface
+using Logging, JuMP, MathOptInterface
 const MOI = MathOptInterface
 using TimerOutputs
 
@@ -30,7 +30,7 @@ function guesswork_ellipsoid(p, ρBs; kwargs...)
 end
 
 
-Base.@kwdef struct EllipsoidProblem{T1,T,TρBs,Tc,Tm,TT,L, LS, TTimer}
+Base.@kwdef struct EllipsoidProblem{T1,T,TρBs,Tc,Tm,TT,L, LS, TTimer, NLS}
     x::Vector{T1}
     P::Matrix{T1}
     p::Vector{T}
@@ -48,12 +48,14 @@ Base.@kwdef struct EllipsoidProblem{T1,T,TρBs,Tc,Tm,TT,L, LS, TTimer}
     logger::L
     linear_solver::LS
     timer::TTimer
+    nl_solver::NLS
 end
 
 function make_ellipsoid_problem(
     p::AbstractVector{T},
     ρBs::AbstractVector{<:AbstractMatrix};
     linear_solver,
+    nl_solver,
     c::AbstractVector = T.(1:length(p)),
     max_retries = 50,
     max_time = Inf,
@@ -103,7 +105,8 @@ function make_ellipsoid_problem(
         tol = Ref(tol),
         logger = logger,
         linear_solver=linear_solver,
-        timer=timer
+        timer=timer,
+        nl_solver = nl_solver,
     )
 end
 
@@ -139,14 +142,14 @@ include("permutations.jl")
 
 function true_feasiblity(prob, Y)
     # only real case for now
-    @unpack p, ρBs, c, dB, logger, linear_solver, timer = prob
+    @unpack p, ρBs, c, dB, logger, linear_solver, timer, nl_solver = prob
     @timeit timer "formulation" begin
         J = length(p)
         A_re = real.(ρBs) .* p
         A_im = imag.(ρBs) .* p
         Y_re = real.(Y)
         Y_im = imag.(Y)
-        m = Model(with_optimizer(() -> EAGO.Optimizer(verbosity=0)))
+        m = Model(nl_solver)
         @variable(m, 0 <= D[i=1:J,j=1:J] <= 1)
         @constraint(m, sum(D, dims = 1) .== 1)
         @constraint(m, sum(D, dims = 2) .== 1)

@@ -29,7 +29,7 @@ function perms(D::AbstractMatrix, solver, rtol)
 end
 
 function maximum_weight_perm(D; solver)
-    model = Model(with_optimizer(solver))
+    model = Model(solver)
     n = size(D,1)
     @variable(model, P[1:n, 1:n] >= 0)
     @objective(model, Max, sum(P[i,j]*D[i,j] for i = 1:n, j=1:n))
