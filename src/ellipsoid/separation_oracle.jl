@@ -54,7 +54,7 @@ end
 
 # Heuristically try to find a cut via simulated annealing
 function SA_find_cut(prob::EllipsoidProblem{T}, Y) where {T}
-    @unpack c, p, dB, ρBs, max_retries, num_steps_per_SA_run, mutate!, timer = prob
+    @unpack c, p, dB, ρBs, max_SA_retries, num_steps_per_SA_run, mutate!, timer = prob
     J = length(p)
 
     R = g -> sum(c[N(invperm(g), x)] * p[x] * ρBs[x] for x in eachindex(p, ρBs))
@@ -87,7 +87,7 @@ function SA_find_cut(prob::EllipsoidProblem{T}, Y) where {T}
     SA_violation::T = 1.0
     n_tries::Int = 0
     @timeit timer "SA" begin
-        while SA_violation > 0 && n_tries < max_retries
+        while SA_violation > 0 && n_tries < max_SA_retries
             n_tries += 1
             # initialize `π` to hold a random permutation,
             # then use the simulated annealing algorithm to try to minimize `f`,

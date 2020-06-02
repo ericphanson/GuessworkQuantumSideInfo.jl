@@ -55,9 +55,8 @@ Base.@kwdef struct EllipsoidProblem{T1,T,TρBs,Tc,Tm,TT,L, TTimer, NLS, TTrace, 
     ρBs::TρBs
     dB::Int
     c::Tc
-    max_retries::Int
-    max_time::Float64
     verbose::Bool
+    max_SA_retries::Int
     num_steps_per_SA_run::Integer
     mutate!::Tm
     deepcut::Bool
@@ -74,6 +73,7 @@ Base.@kwdef struct EllipsoidProblem{T1,T,TρBs,Tc,Tm,TT,L, TTimer, NLS, TTrace, 
     cuts::Vector{Vector{Int}}
     iter::I
     f_best::F
+    max_time::Base.RefValue{Millisecond}
 end
 
 function EllipsoidProblem(
@@ -81,9 +81,7 @@ function EllipsoidProblem(
     ρBs::AbstractVector{<:AbstractMatrix};
     nl_solver,
     c::AbstractVector = T.(1:length(p)),
-    max_retries = 2,
-    max_time = Inf,
-    num_constraints = Inf,
+    max_SA_retries = 2,
     verbose::Bool = true,
     num_steps_per_SA_run::Integer = length(p)^2 * 500,
     mutate! = rand_rev!,
@@ -101,7 +99,8 @@ function EllipsoidProblem(
     timer = TimerOutput(),
     cuts = Vector{Int}[],
     iter = Ref(1),
-    f_best = Ref(T(Inf))
+    f_best = Ref(T(Inf)),
+    max_time::TimePeriod = Hour(typemax(Int)),
 ) where {T}
 
     length(p) == length(ρBs) ||
@@ -115,9 +114,14 @@ function EllipsoidProblem(
         throw(ArgumentError("Need `length(c) >= length(p)`."))
     end
 
+    if !issorted(c)
+        throw(ArgumentError("`c` must be increasing."))
+    end
     if x === nothing || P === nothing
         @unpack x, P = default_init(p, ρBs, c, dB, init_noise) 
     end
+
+    max_time = Ref(convert(Millisecond, max_time))
 
     return EllipsoidProblem(
         x=x,
@@ -127,8 +131,7 @@ function EllipsoidProblem(
         ρBs=ρBs,
         dB=dB,
         c=c,
-        max_retries=max_retries,
-        max_time=max_time,
+        max_SA_retries=max_SA_retries,
         verbose=verbose,
         num_steps_per_SA_run=num_steps_per_SA_run,
         mutate! = mutate!,
@@ -146,6 +149,7 @@ function EllipsoidProblem(
         cuts=cuts,
         iter=iter,
         f_best=f_best,
+        max_time = max_time,
     )
 end
 
@@ -153,26 +157,31 @@ function unit_ball_volume(n)
     π^(n/2) / gamma(n/2 + 1)
 end
 
-function ellipsoid_algorithm!(f::EllipsoidProblem, newtol::Union{Number, Nothing}=nothing)
+# `max_time` given, so update
+function ellipsoid_algorithm!(f::EllipsoidProblem; tol::Union{Number, Nothing}=nothing, max_time::Union{TimePeriod, Nothing} = nothing)
+    if tol !== nothing
+        f.tol[] = tol
+    end
+
+    if max_time !== nothing
+        f.max_time[] = convert(Millisecond, max_time)
+    end
+
     with_logger(f.logger) do
-        _ellipsoid_algorithm!(f, newtol)
+        _ellipsoid_algorithm!(f)
     end
 end
 
-function _ellipsoid_algorithm!(f::EllipsoidProblem{T}, newtol::Union{Number, Nothing}=nothing) where {T}
+function _ellipsoid_algorithm!(f::EllipsoidProblem{T}) where {T}
     @unpack dB, x, P, timer, normal_cone_tol, verbose, tracelog, trace, deepcut = f
-    @unpack iter, f_best, x_best = f
-    if newtol !== nothing
-        f.tol[] = newtol
-    end
-    @unpack timer_log_interval = f
-    t_log = now()
-    ϵ = f.tol[]
+    @unpack iter, f_best, x_best, max_time, timer_log_interval = f
+
+    tol = f.tol[]
+    t_log = t_init = now()
     dB = f.dB
     n = length(x)
     vol0 = unit_ball_volume(n)
     while true
-
         if verbose
             @timeit timer "Display timer" begin
                 if now() - t_log >= timer_log_interval
@@ -224,10 +233,22 @@ function _ellipsoid_algorithm!(f::EllipsoidProblem{T}, newtol::Union{Number, Not
         end
 
         # Exit condition
-        if feasible && γ ≤ ϵ
+        if feasible && γ ≤ tol
             Y = herm(x)
-            return (optval = tr(Y), Y=Y, p = f.p, ρBs = f.ρBs, c = f.c,
+            return (status = MOI.OPTIMAL, optval = tr(Y), Y=Y,
+                    p = f.p, ρBs = f.ρBs, c = f.c,
                     J = length(f.p), K = length(f.p), prob=f)
+        end
+
+        # Early stopping if max time exceeded
+        if now() - t_init >= max_time[]
+            Y = herm(x)
+            if verbose
+                println("Warning: hit maximum time, stopping early.")
+            end
+            return (status =  MOI.TIME_LIMIT, optval = tr(Y), Y=Y,
+            p = f.p, ρBs = f.ρBs, c = f.c,
+            J = length(f.p), K = length(f.p), prob=f) 
         end
 
         # Update ellipsoid center
