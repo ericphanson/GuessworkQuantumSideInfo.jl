@@ -2,12 +2,13 @@
     PermutationIterator(D::AbstractMatrix; timer=nothing, rtol=1e-6)
 
 Iterates over permutations and weights to form a decomposition
-of a doubly stochastic matrix `D`. 
+of a doubly stochastic matrix `D`, known as the Birkhoff–von Neumann
+decomposition.
 
 Optionally, specify the keyword arguments
 
 * `timer`: a TimerOutputs.jl timer
-* `rtol` (relative tolerance) for comparing `α_i` to `1` to see if all the permutations have been found.
+* `rtol`: (relative tolerance) for comparing `α_i` to `1` to see if all the permutations have been found.
 
 ## Example
 
