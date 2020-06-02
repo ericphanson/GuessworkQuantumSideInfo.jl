@@ -1,41 +1,86 @@
-@Base.kwdef struct PermutationIterator{T1, T2, T3}
+"""
+    PermutationIterator(D::AbstractMatrix; timer=nothing, rtol=1e-6)
+
+Iterates over permutations and weights to form a decomposition
+of a doubly stochastic matrix `D`. 
+
+Optionally, specify the keyword arguments
+
+* `timer`: a TimerOutputs.jl timer
+* `rtol` (relative tolerance) for comparing `α_i` to `1` to see if all the permutations have been found.
+
+## Example
+
+```julia
+# Construct a `d` by `d` doubly stochastic matrix
+d = 4
+α_init = rand(5)
+α_init = α_init / sum(α_init)
+D = sum( α_init[i]*I(d)[randperm(d), :] for i = 1:5 )
+
+# Reconstruct it from permutations
+D_reconstruct = zero(D)
+for (π_i, α_i) in PermutationIterator(D)
+    P_i = I(d)[π_i, :]
+    global D_reconstruct += α_i * P_i
+end
+@test D_reconstruct ≈ D
+```
+"""
+@Base.kwdef struct PermutationIterator{T1, T2, TTimer, V}
     D::T1
-    solver::T2
-    rtol::T3 = 1e-6
+    αs::V = eltype(D)[]
+    rtol::T2 = 1e-6
+    timer::TTimer = nothing
 end
 
-function Base.iterate(PI::PermutationIterator, state = (PI.D, 0))
+PermutationIterator(D::AbstractMatrix; kwargs...) = PermutationIterator(; D=D, kwargs...)
+
+Base.IteratorSize(::PermutationIterator) = Base.SizeUnknown()
+Base.IteratorEltype(::PermutationIterator) = Base.HasEltype()
+Base.eltype(::PermutationIterator) = Tuple{Vector{Int}, Float64}
+
+function Base.iterate(PI::PermutationIterator)
+    state = PI.D
+    empty!(PI.αs)
+    iterate(PI, state)
+end
+
+function Base.iterate(PI::PermutationIterator, state)
     state === nothing && return nothing
-    _it(PI, state)
-end
+    D = state
+    @unpack rtol, timer, αs = PI
 
-function _it(PI, (D,c))
-    @unpack solver, rtol = PI
-    @unpack P,α0, D1, done = perms(D, solver, rtol)
-    c += 1
-    # done = done || c >= size(D,1)
-    state = done ? nothing : (D1,c)
-    return P, state
-end
+    # Find the maximum weight permutation
+    if timer === nothing
+        π = maximum_weight_perm(D)
+    else
+        @timeit timer "maximum_weight_perm" begin
+        π = maximum_weight_perm(D)
+        end
+    end
 
-
-function perms(D::AbstractMatrix, solver, rtol)
     n = size(D,1)
-    P = maximum_weight_perm(D, solver=solver)
-    α0 = minimum( D[i,j] / P[i,j] for i = 1:n, j = 1:n if P[i,j] > 0 )
-    done = isapprox(α0, 1; rtol=rtol)
-    D1 = done ? D : (D - α0*P)/(1-α0)
-    return (P=P, D1=D1, done=done, α0 =α0)
+    α0 = minimum( D[i,π[i]] for i = 1:n )
+    c = isempty(αs) ? 1 : prod( 1 - α for α in αs)
+    push!(αs, α0)
+
+    if isapprox(α0, 1; rtol=rtol)
+        # This was the last permutation
+        return (π, c*α0), nothing
+    else
+        # Prepare the next doubly stochastic matrix
+        # solve for `D1` so that
+        # `D = α0 P + (1-α0) D1`
+        D1 = copy(D)
+        for i = 1:n
+            D1[i, π[i]] -= α0
+        end
+        return (π, c*α0), D1/(1-α0)
+    end
 end
 
-function maximum_weight_perm(D; solver)
-    model = Model(solver)
-    n = size(D,1)
-    @variable(model, P[1:n, 1:n] >= 0)
-    @objective(model, Max, sum(P[i,j]*D[i,j] for i = 1:n, j=1:n))
-    @constraint(model, sum(P, dims = 1) .<= 1)
-    @constraint(model, sum(P, dims = 2) .<= 1)
-    JuMP.optimize!(model)
-    @assert termination_status(model) == MOI.OPTIMAL
-    value.(P)
+function maximum_weight_perm(D)
+    assignment, cost = hungarian(-D)
+    assignment
 end

@@ -42,7 +42,7 @@ function test_optimize(
     local current_output
 
     if TEST_ELLIPSOID
-        current_output = guesswork_ellipsoid(p, ρBs; tol=1e-3, kwargs...)
+        current_output = guesswork_ellipsoid(p, ρBs; nl_solver = nl_solver(), tol=1e-3, verbose=false, kwargs...)
         push!(optvals, current_output.optval)
         push!(
             test_data,

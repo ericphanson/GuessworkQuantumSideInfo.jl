@@ -1,10 +1,11 @@
 module GuessworkQuantumSideInfo
 
-using LinearAlgebra, SparseArrays # standard libraries
+using LinearAlgebra, SparseArrays, Dates # standard libraries
 using Random: randperm! # standard library
 using Convex # Julia SDP solvers / interfaces
 using Combinatorics: multiset_permutations, combinations # used for POVM outcomes
 using UnPack # helper
+using Hungarian # solves the perfect matching problem
 
 # Basic functions for quantum states and examples
 export ket, bra, ⊗, I, dm, randdm, randprobvec, iid_copies, BB84_states

@@ -1,13 +1,13 @@
 using Test, GuessworkQuantumSideInfo, LinearAlgebra, Statistics, Random, UnPack
 using GenericLinearAlgebra
 using SCS
-using GuessworkQuantumSideInfo: herm, invherm
+using GuessworkQuantumSideInfo: herm, invherm, PermutationIterator
 
 TEST_MATLAB = false # requires MATLAB and MATLAB.jl installed
 TEST_MISDP = false # requires Pajarito or another MISDP solver
 TEST_BB84_MISDP = false # takes ~100 seconds; requires TEST_MISDP
 TEST_MOI = true # incompatible with the current version of Pajarito
-TEST_ELLIPSOID = false # does not pass yet since currently a heuristic
+TEST_ELLIPSOID = false # EAGO is having compat trouble... 
 
 @info "Beginning tests with" TEST_MATLAB TEST_MISDP TEST_BB84_MISDP TEST_MOI TEST_ELLIPSOID
 
@@ -32,6 +32,11 @@ if TEST_MISDP
             log_level = verbose ? 3 : 0,
         )
     end
+end
+
+if TEST_ELLIPSOID
+    using JuMP, EAGO
+    nl_solver() = with_optimizer(() -> EAGO.Optimizer(verbosity=0))
 end
 
 if TEST_MATLAB
@@ -81,6 +86,22 @@ Random.seed!(5)
         end
     end
 
+    @testset "Birkhoff's theorem" begin
+        for d in (2,3,5), T in (Float64, BigFloat)
+            n = 5
+            α_init = rand(T, n)
+            α_init = α_init / sum(α_init)
+            D = sum( α_init[i]*I(d)[randperm(d), :] for i = 1:n )
+            
+            # Reconstruct it from permutations
+            D_reconstruct = zero(D)
+            for (π_i, α_i) in PermutationIterator(D)
+                P_i = I(d)[π_i, :]
+                global D_reconstruct += α_i * P_i
+            end
+            @test D_reconstruct ≈ D
+        end
+    end
     @testset "Uninformative side information" begin
         ρBs = dm.([ketzero, ketzero])
         p = [0.5, 0.5]
