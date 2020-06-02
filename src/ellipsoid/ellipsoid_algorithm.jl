@@ -221,7 +221,7 @@ function _ellipsoid_algorithm!(f::EllipsoidProblem{T}) where {T}
         end
         
         # How big is our ellipsoid?
-        vol = vol0 * sqrt(det(P))
+        vol = vol0 * sqrt(det(Hermitian(P)))
 
         if !feasible
             f_val = NaN
@@ -229,7 +229,8 @@ function _ellipsoid_algorithm!(f::EllipsoidProblem{T}) where {T}
 
         @info "Iteration" iter[] vol γ feasible f_val f_best[] method α
         @timeit timer "Trace logging" begin
-            trace && push!(tracelog, (iter=iter[], method=method, status=status, γ=γ, f_best=f_best[], vol=vol, f_val = f_val, maxradii=eigmax(P), α=α, π=π, x = copy(x), P = copy(P)))
+            maxradii = eigmax(Hermitian(P))
+            trace && push!(tracelog, (iter=iter[], method=method, status=status, γ=γ, f_best=f_best[], vol=vol, f_val = f_val, maxradii=maxradii, α=α, π=π, x = copy(x), P = copy(P)))
         end
 
         # Exit condition
