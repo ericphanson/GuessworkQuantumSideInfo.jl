@@ -21,12 +21,14 @@ UnPack = "3a884ed6-31ef-47d7-9d2a-63182c4928ed"
 [compat]
 Combinatorics = "1"
 Convex = "0.12, 0.13"
+Hungarian = "0.6"
+JuMP = "0.18, 0.19, 0.20, 0.21"
+SpecialFunctions = "0.8, 0.9, 0.10"
+TimerOutputs = "0.5"
 UnPack = "0.1, 1.0"
 julia = "1"
 
 [extras]
-Cbc = "9961bab8-2fa3-5c5a-9d89-47fab24efd76"
-EAGO = "bb8be931-2a91-5aca-9f87-79e1cb69959a"
 GenericLinearAlgebra = "14197337-ba66-59df-a3e3-ca00e7dcff7a"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 SCS = "c946c3f1-0d1f-5ce8-9dea-7daa1f7e2d13"
@@ -34,4 +36,4 @@ Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Random", "Test", "Statistics", "SCS", "Cbc", "GenericLinearAlgebra", "EAGO"]
+test = ["Random", "Test", "Statistics", "SCS", "GenericLinearAlgebra"]
