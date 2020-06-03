@@ -46,9 +46,7 @@ version = "1.0.2"
 
 [[Convex]]
 deps = ["AbstractTrees", "BenchmarkTools", "LinearAlgebra", "MathOptInterface", "OrderedCollections", "SparseArrays", "Test"]
-git-tree-sha1 = "f05fc166ee6f09a5a2ea8580fda875d55086ce84"
-repo-rev = "master"
-repo-url = "https://github.com/JuliaOpt/Convex.jl.git"
+git-tree-sha1 = "e6d2623466542997041356971d1f02e570b4319a"
 uuid = "f65535da-76fb-5f13-bab9-19810c17039a"
 version = "0.13.3"
 
