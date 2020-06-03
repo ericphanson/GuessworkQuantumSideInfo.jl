@@ -1,4 +1,4 @@
-name: CI
+name: CI with Julia nightlies
 on:
   push:
     branches:
