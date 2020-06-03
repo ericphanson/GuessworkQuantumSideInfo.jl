@@ -90,6 +90,7 @@ function EllipsoidProblem(
     deepcut = true,
     timer_log_interval::Millisecond = Millisecond(1)*1e4,
     x = nothing,
+    x_best = nothing,
     P = nothing,
     tol = 1e-3,
     normal_cone_tol = 1e-4,
@@ -100,6 +101,7 @@ function EllipsoidProblem(
     cuts = Vector{Int}[],
     iter = Ref(1),
     f_best = Ref(T(Inf)),
+    tracelog = [],
     max_time::TimePeriod = Hour(typemax(Int)),
 ) where {T}
 
@@ -118,14 +120,17 @@ function EllipsoidProblem(
         throw(ArgumentError("`c` must be increasing."))
     end
     if x === nothing || P === nothing
-        @unpack x, P = default_init(p, ρBs, c, dB, init_noise) 
+        @unpack x, P = default_init(p, ρBs, c, dB, init_noise)
+    end
+    if x_best === nothing
+        x_best = copy(x)
     end
 
     max_time = Ref(convert(Millisecond, max_time))
 
     return EllipsoidProblem(
         x=x,
-        x_best=copy(x),
+        x_best=x_best,
         P=P,
         p=p,
         ρBs=ρBs,
@@ -143,7 +148,7 @@ function EllipsoidProblem(
         logger = logger,
         timer=timer,
         nl_solver = nl_solver,
-        tracelog = [],
+        tracelog = tracelog,
         deepcut = deepcut,
         timer_log_interval=timer_log_interval,
         cuts=cuts,
