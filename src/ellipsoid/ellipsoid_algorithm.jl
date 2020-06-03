@@ -1,6 +1,45 @@
 @enum FeasibilityStates FEASIBLE INFEASIBLE UNKNOWN
 
-# wrapper method to match `guesswork_upper_bound` etc.
+"""
+    guesswork_ellipsoid(p, ρBs; nl_solver, kwargs...) -> NamedTuple
+ 
+Solves the guesswork SDP via a custom implementation of the ellipsoid algorithm.
+When provided a global optimizer for the `nl_solver` keyword (e.g. via EAGO.jl),
+this computes the value guesswork SDP. Keyword arguments are:
+
+* `nl_solver`: choice of nonlinear optimizer to use
+* `c::AbstractVector = T.(1:length(p))`: choice of cost vector
+* `deepcut = true`: whether to use "deep cuts" (can be faster)
+* `tol = 1e-3`: solve tolerance (final value should be within `tol` of true solution)
+* `max_time::TimePeriod`: provide an approximate upper limit on the duration of the solve (defaults to unlimited)
+* `verbose::Bool = true`: whether to print timing information every so often to the terminal
+* `timer_log_interval::Millisecond = Millisecond(1)*1e4`: how often to print timing information
+* `logger = verbose ? ConsoleLogger() : NullLogger()`: provide a logger (such as via TensorBoardLogger.jl) to log
+  information during a run.
+* `normal_cone_tol = 0.0`: absolute tolerance to decide if a number is negative for the purpose of computing an element in the normal cone
+* `perm_tol = 1e-4`: a relative tolerance to decide if a number is `1` for the purpose of finding permutations in the support of a doubly stochastic matrix
+* `init_noise = 1e-6`: an amount of noise to add to the initial point to reduce symmetries
+* `trace = true`: whether or not to store a trace of the center and shape of the ellipsoid, along with other parameters, at each step
+* `max_SA_retries = 2`: a parameter to decide how many times to run a simulated annealing algorithm to find cuts before resorting to global optimization
+* `num_steps_per_SA_run::Integer = length(p)^2 * 500`: how many steps to perform during each simulated annealing run
+* `mutate! = rand_rev!`: mutation function for updating during the simulated annealing run
+* `x = nothing`: initial center point of the ellipse (automatically chosen by [`default_init`](@ref) if left unspecified)
+* `P = nothing`: initial shape of the ellipse (automatically chosen by [`default_init`](@ref) if left unspecified)
+
+To aid in resuming a previous run (after hitting a time limit or tightening `tol`), the following parameters may be passed:
+
+* `x_best = nothing`: 
+* `timer = TimerOutput()`: 
+* `cuts = Vector{Int}[]`: 
+* `iter = Ref(1)`: 
+* `f_best = Ref(T(Inf))`: 
+* `tracelog = []`: 
+
+If `results = guesswork_ellipsoid(p, ρBs; nl_solver = ...)`, then `results.prob` holds the previous solution
+object. This run may be continued by `ellipsoid_algorithm!(results.prob; tol=...)` or fields may be passed
+here, e.g. `guesswork_ellipsoid(p, ρBs; x_best = results.prob.x_best, ...)`, or to the
+[`EllipsoidProblem`](@ref) constructor, e.g. `EllipsoidProblem(x_best = results.prob.x_best, ...)`.
+"""
 function guesswork_ellipsoid(p, ρBs; kwargs...)
     prob = EllipsoidProblem(p, ρBs; kwargs...)
     return ellipsoid_algorithm!(prob)
@@ -11,7 +50,7 @@ end
 
 Choose an initial center `x` and shape `P` of the ellipse
 such that the solution is guaranteed to be inside the ellipse.
-The initial piont is chosen to correspond to `c[1]*ρB + noise` where
+The initial point is chosen to correspond to `c[1]*ρB + noise` where
 `ρB` is the average state, and `noise` is a small perturbation
 whose norm is governed by `init_noise`.
 """
@@ -46,6 +85,10 @@ results = guesswork_ellipsoid(p, ρBs; tol=1e-3, nl_solver = ...)
 # Continue to solve with a tighter solution tolerance:
 results2 = ellipsoid_algorithm!(results.prob; tol=1e-4)
 ```
+
+See [`guesswork_ellipsoid`](@ref) for the possible keyword arguments
+for constructing an `EllipsoidProblem`, which may be constructed by e.g.
+`EllipsoidProblem(p, ρBs; nl_solver = ..., kwargs...)`.
 """
 Base.@kwdef struct EllipsoidProblem{T1,T,TρBs,Tc,Tm,TT,L, TTimer, NLS, TTrace, I, F}
     x::Vector{T1}
@@ -93,7 +136,7 @@ function EllipsoidProblem(
     x_best = nothing,
     P = nothing,
     tol = 1e-3,
-    normal_cone_tol = 1e-4,
+    normal_cone_tol = 0.0,
     perm_tol = 1e-4,
     init_noise = 1e-6,
     logger = verbose ? ConsoleLogger() : NullLogger(),
@@ -102,7 +145,7 @@ function EllipsoidProblem(
     iter = Ref(1),
     f_best = Ref(T(Inf)),
     tracelog = [],
-    max_time::TimePeriod = Hour(typemax(Int)),
+    max_time::TimePeriod = Millisecond(typemax(Int)),
 ) where {T}
 
     length(p) == length(ρBs) ||
