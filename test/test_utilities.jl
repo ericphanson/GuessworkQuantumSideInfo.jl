@@ -35,13 +35,14 @@ function test_optimize(
     true_opt_val = nothing;
     test_repetition = false,
     test_MISDP = true,
+    test_ellipsoid = true,
     kwargs...
 )
     optvals = []
     test_data = []
     local current_output
 
-    if TEST_ELLIPSOID
+    if TEST_ELLIPSOID && test_ellipsoid
         current_output = guesswork_ellipsoid(p, ρBs; nl_solver = nl_solver(), tol=1e-3, verbose=false, kwargs...)
         push!(optvals, current_output.optval)
         push!(

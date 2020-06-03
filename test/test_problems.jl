@@ -118,7 +118,7 @@ Random.seed!(5)
         end
 
         @testset "K=2 guesses" begin
-            output_K = test_optimize(p, ρBs; test_MISDP = false, K = 2)
+            output_K = test_optimize(p, ρBs; test_MISDP = false, test_ellipsoid = false, K = 2)
             pmf = pmfN(output_K)
             @test length(pmf) == 3
             @test sum(pmf) ≈ 1.0 atol = TOL

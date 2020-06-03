@@ -1,18 +1,19 @@
 using Test, GuessworkQuantumSideInfo, LinearAlgebra, Statistics, Random, UnPack
 using GenericLinearAlgebra
 using SCS
-using GuessworkQuantumSideInfo: herm, invherm, PermutationIterator
+
+using EAGO, JuMP
 
 TEST_MATLAB = false # requires MATLAB and MATLAB.jl installed
 TEST_MISDP = false # requires Pajarito or another MISDP solver
 TEST_BB84_MISDP = false # takes ~100 seconds; requires TEST_MISDP
 TEST_MOI = true # incompatible with the current version of Pajarito
-TEST_ELLIPSOID = false
+TEST_ELLIPSOID = true
 
-default_sdp_solver() = TEST_MOI ? SCS.Optimizer(verbose = 0, eps = 1e-6) : SCSSolver(verbose = 0, eps = 1e-6)
+default_sdp_solver() = SCS.Optimizer(verbose = 0, eps = 1e-6)
 
-if TEST_MATLAB
-    include("test_matlab.jl")
+function nl_solver()
+    with_optimizer(() -> EAGO.Optimizer(verbosity=0))
 end
 
-include("test_problems.jl")
+include("../test_problems.jl")
