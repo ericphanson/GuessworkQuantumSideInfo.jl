@@ -1,4 +1,7 @@
-name: CI
+# These tests run in a separate environment
+# since they use a Manifest for reproducibility
+# and we want to ensure it doesn't break.
+name: High precision tests
 on:
   push:
     branches:
@@ -8,6 +11,7 @@ on:
       - 'README.md'
       - '.github/workflows/CompatHelper.yml'
       - '.github/workflows/TagBot.yml'
+      - 'docs/**'
   pull_request:
     branches:
       - master
@@ -16,6 +20,7 @@ on:
       - 'README.md'
       - '.github/workflows/CompatHelper.yml'
       - '.github/workflows/TagBot.yml'
+      - 'docs/**'
 jobs:
   test:
     name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }}
@@ -23,12 +28,10 @@ jobs:
     strategy:
       matrix:
         version:
-          - '1.0'
           - '1.4'
         os:
           - ubuntu-latest
           - macOS-latest
-          - windows-latest
         arch:
           - x64
     steps:
@@ -48,7 +51,10 @@ jobs:
             ${{ runner.os }}-test-
             ${{ runner.os }}-
       - uses: julia-actions/julia-buildpkg@latest
-      - uses: julia-actions/julia-runtest@latest
+      - run: julia --project=test/high_precision_tests -e '
+              using Pkg;
+              Pkg.instantiate();'
+      - run: julia --project=test/high_precision_tests --color=yes --check-bounds=yes --code-coverage=user --startup-file=no test/high_precision_tests/tests.jl
       - uses: julia-actions/julia-processcoverage@v1
       - uses: codecov/codecov-action@v1
         with:
@@ -56,19 +62,4 @@ jobs:
           flags: unittests
           name: codecov-umbrella
           fail_ci_if_error: false
-  docs:
-    name: Documentation
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: julia-actions/setup-julia@v1
-        with:
-          version: '1.0'
-      - run: julia --project=docs -e '
-          using Pkg;
-          Pkg.develop(PackageSpec(; path=pwd()));
-          Pkg.instantiate();'
-      - run: julia --project=docs docs/make.jl
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
+  

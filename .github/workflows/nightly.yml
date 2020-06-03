@@ -1,4 +1,8 @@
-name: CI
+# These tests are with Julia nightlies
+# and may fail due to bugs in these
+# in-development versions of Julia.
+# We thus separate them out.
+name: CI with Julia nightlies
 on:
   push:
     branches:
@@ -23,8 +27,7 @@ jobs:
     strategy:
       matrix:
         version:
-          - '1.0'
-          - '1.4'
+          - 'nightly'
         os:
           - ubuntu-latest
           - macOS-latest
@@ -56,19 +59,3 @@ jobs:
           flags: unittests
           name: codecov-umbrella
           fail_ci_if_error: false
-  docs:
-    name: Documentation
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: julia-actions/setup-julia@v1
-        with:
-          version: '1.0'
-      - run: julia --project=docs -e '
-          using Pkg;
-          Pkg.develop(PackageSpec(; path=pwd()));
-          Pkg.instantiate();'
-      - run: julia --project=docs docs/make.jl
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
