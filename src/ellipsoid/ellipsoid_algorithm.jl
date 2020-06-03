@@ -205,7 +205,13 @@ function unit_ball_volume(n)
     π^(n/2) / gamma(n/2 + 1)
 end
 
-# `max_time` given, so update
+"""
+    ellipsoid_algorithm!(f::EllipsoidProblem; tol=nothing, max_time=nothing)
+
+Run the ellipsoid algorithm on the [`EllipsoidProblem`](@ref) `f`. Optionally, pass
+the keyword argument `tol` or `max_time` to update these parameters of `f` before
+running.
+"""
 function ellipsoid_algorithm!(f::EllipsoidProblem; tol::Union{Number, Nothing}=nothing, max_time::Union{TimePeriod, Nothing} = nothing)
     if tol !== nothing
         f.tol[] = tol
