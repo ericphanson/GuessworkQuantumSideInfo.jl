@@ -9,8 +9,8 @@ on:
     paths-ignore:
       - 'LICENSE.md'
       - 'README.md'
-      - '.github/CompatHelper.yml'
-      - '.github/TagBot.yml'
+      - '.github/workflows/CompatHelper.yml'
+      - '.github/workflows/TagBot.yml'
       - 'docs/**'
   pull_request:
     branches:
@@ -18,8 +18,8 @@ on:
     paths-ignore:
       - 'LICENSE.md'
       - 'README.md'
-      - '.github/CompatHelper.yml'
-      - '.github/TagBot.yml'
+      - '.github/workflows/CompatHelper.yml'
+      - '.github/workflows/TagBot.yml'
       - 'docs/**'
 jobs:
   test:
