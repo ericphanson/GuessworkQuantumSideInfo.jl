@@ -28,7 +28,7 @@ default_sdp_solver(T) = SDPAFamily.Optimizer{T}(presolve = true)
     output = guesswork(p, ρBs; solver = default_sdp_solver(T))
     testPOVM(output.Es)
     relaxed_output =
-        guesswork_upper_bound(p, ρBs, 4; make_solver = () -> default_sdp_solver(T))
+        guesswork_upper_bound(p, ρBs; num_constraints = 4, make_solver = () -> default_sdp_solver(T))
 
     true_val = (big(1) / big(4)) * (10 - sqrt(big(10)))
     @test output.optval ≈ true_val rtol = 1e-25
