@@ -55,7 +55,7 @@ jobs:
       - uses: julia-actions/julia-buildpkg@latest
       - run: julia --project=test/pajarito_tests -e '
               using Pkg;
-              Pkg.develop(PackageSpec(; path=pwd())); # no manifest checked in, so dev the current version
+              Pkg.develop(PackageSpec(; path=pwd()));
               Pkg.instantiate();'
       - run: julia --project=test/pajarito_tests --color=yes --check-bounds=yes --code-coverage=user --startup-file=no test/pajarito_tests/tests.jl
       - uses: julia-actions/julia-processcoverage@v1
