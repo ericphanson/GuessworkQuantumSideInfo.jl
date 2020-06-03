@@ -48,10 +48,6 @@ jobs:
             ${{ runner.os }}-
       - uses: julia-actions/julia-buildpkg@latest
       - uses: julia-actions/julia-runtest@latest
-      - run: julia --project=test/high_precision_tests -e '
-              using Pkg;
-              Pkg.instantiate();'
-      - run: julia --project=test/high_precision_tests --color=yes --check-bounds=yes --code-coverage=user --startup-file=no test/high_precision_tests/tests.jl
       - uses: julia-actions/julia-processcoverage@v1
       - uses: codecov/codecov-action@v1
         with:
