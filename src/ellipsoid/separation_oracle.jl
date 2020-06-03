@@ -16,7 +16,7 @@ function separation_oracle(prob::EllipsoidProblem{T}, Y) where {T}
         @unpack status, RY, π = SA_find_cut(prob, Y)
     end
     if status == INFEASIBLE
-        return (status=state, RY=RY, π=π, method=:simulated_annealing)
+        return (status=INFEASIBLE, RY=RY, π=π, method=:simulated_annealing)
     end
     
     # last resort: globally solve a nonlinear problem
