@@ -1,3 +1,6 @@
+# These tests run in a separate environment
+# since they use a Manifest for reproducibility
+# and we want to ensure it doesn't break.
 name: High precision tests
 on:
   push:
