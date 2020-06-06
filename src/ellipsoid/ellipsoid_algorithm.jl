@@ -262,13 +262,26 @@ function _ellipsoid_algorithm!(f::EllipsoidProblem{T}) where {T}
             # Constraint cut
             push!(f.cuts, π)
             g = -invherm(normal_cone_element(PSD(), RY; tol = normal_cone_tol[]))
-            γ = sqrt(dot(g, P, g))
-            constraint_violation = -eigmin(RY)
-            α = deepcut ? min(constraint_violation / γ, .9) : 0
         else
             # objective cut
             g = invherm(-I(dB)) # derivative of -tr(Y)
-            γ = sqrt(dot(g, P, g))
+        end
+    
+        γ2 = dot(g, P, g)
+        if γ2 < 0
+            Y = herm(x_best) # return the best feasible point we've found
+            return (status = MOI.NUMERICAL_ERROR, optval = tr(Y), Y=Y,
+                    p = f.p, ρBs = f.ρBs, c = f.c,
+                    J = length(f.p), K = length(f.p), prob=f)
+        end
+        
+        γ = sqrt(γ2)
+
+        if !feasible
+            f_val = NaN
+            constraint_violation = -eigmin(RY)
+            α = deepcut ? min(constraint_violation / γ, .9) : 0
+        else
             f_val = -tr(herm(x))
             if f_best[] > f_val
                 f_best[] = f_val
@@ -279,10 +292,6 @@ function _ellipsoid_algorithm!(f::EllipsoidProblem{T}) where {T}
         
         # How big is our ellipsoid?
         vol = vol0 * sqrt(det(Hermitian(P)))
-
-        if !feasible
-            f_val = NaN
-        end
 
         @info "Iteration" iter[] vol γ feasible f_val f_best[] method α
         @timeit timer "Trace logging" begin
