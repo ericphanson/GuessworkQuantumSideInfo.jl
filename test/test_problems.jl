@@ -1,4 +1,3 @@
-
 # bad solve error on 1.0 and nightly observed on CI (though not locally)
 # possibly reflects problems with SCS, but not with this package,
 # so we'll just use a relaxed tolerance here.
