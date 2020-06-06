@@ -14,7 +14,7 @@ this computes the value guesswork SDP. Keyword arguments are:
 * `max_time::TimePeriod`: provide an approximate upper limit on the duration of the solve (defaults to unlimited)
 * `verbose::Bool = true`: whether to print timing information every so often to the terminal
 * `timer_log_interval::Millisecond = Millisecond(1)*1e4`: how often to print timing information
-* `logger = verbose ? ConsoleLogger() : NullLogger()`: provide a logger (such as via TensorBoardLogger.jl) to log
+* `logger = nothing`: provide a logger (such as via TensorBoardLogger.jl) to log
   information during a run.
 * `normal_cone_tol = 0.0`: absolute tolerance to decide if a number is negative for the purpose of computing an element in the normal cone
 * `perm_tol = 1e-4`: a relative tolerance to decide if a number is `1` for the purpose of finding permutations in the support of a doubly stochastic matrix
@@ -40,9 +40,9 @@ object. This run may be continued by `ellipsoid_algorithm!(results.prob; tol=...
 here, e.g. `guesswork_ellipsoid(p, ρBs; x_best = results.prob.x_best, ...)`, or to the
 [`EllipsoidProblem`](@ref) constructor, e.g. `EllipsoidProblem(x_best = results.prob.x_best, ...)`.
 """
-function guesswork_ellipsoid(p, ρBs; kwargs...)
+function guesswork_ellipsoid(p, ρBs; logger = nothing, kwargs...)
     prob = EllipsoidProblem(p, ρBs; kwargs...)
-    return ellipsoid_algorithm!(prob)
+    return ellipsoid_algorithm!(prob, logger = logger)
 end
 
 """
@@ -90,7 +90,7 @@ See [`guesswork_ellipsoid`](@ref) for the possible keyword arguments
 for constructing an `EllipsoidProblem`, which may be constructed by e.g.
 `EllipsoidProblem(p, ρBs; nl_solver = ..., kwargs...)`.
 """
-Base.@kwdef struct EllipsoidProblem{T1,T,TρBs,Tc,Tm,TT,L, TTimer, NLS, TTrace, I, F, SRD}
+Base.@kwdef struct EllipsoidProblem{T1,T,TρBs,Tc,Tm,TT,TTimer,NLS,TTrace,I,F, SRD}
     x::Vector{T1}
     x_best::Vector{T1}
     P::Matrix{T1}
@@ -109,7 +109,6 @@ Base.@kwdef struct EllipsoidProblem{T1,T,TρBs,Tc,Tm,TT,L, TTimer, NLS, TTrace, 
     tol::TT
     normal_cone_tol::TT
     perm_tol::TT
-    logger::L
     timer::TTimer
     nl_solver::NLS
     timer_log_interval::Millisecond
@@ -140,7 +139,6 @@ function EllipsoidProblem(
     normal_cone_tol = 0.0,
     perm_tol = 1e-4,
     init_noise = 1e-6,
-    logger = verbose ? ConsoleLogger() : NullLogger(),
     timer = TimerOutput(),
     cuts = Vector{Int}[],
     iter = Ref(1),
@@ -190,7 +188,6 @@ function EllipsoidProblem(
         tol = Ref(tol),
         normal_cone_tol = Ref(normal_cone_tol),
         perm_tol = Ref(perm_tol),
-        logger = logger,
         timer=timer,
         nl_solver = nl_solver,
         tracelog = tracelog,
@@ -215,7 +212,12 @@ Run the ellipsoid algorithm on the [`EllipsoidProblem`](@ref) `f`. Optionally, p
 the keyword argument `tol` or `max_time` to update these parameters of `f` before
 running.
 """
-function ellipsoid_algorithm!(f::EllipsoidProblem; tol::Union{Number, Nothing}=nothing, max_time::Union{TimePeriod, Nothing} = nothing)
+function ellipsoid_algorithm!(
+    f::EllipsoidProblem;
+    tol::Union{Number,Nothing} = nothing,
+    max_time::Union{TimePeriod,Nothing} = nothing,
+    logger = nothing
+)
     if tol !== nothing
         f.tol[] = tol
     end
@@ -224,7 +226,11 @@ function ellipsoid_algorithm!(f::EllipsoidProblem; tol::Union{Number, Nothing}=n
         f.max_time[] = convert(Millisecond, max_time)
     end
 
-    with_logger(f.logger) do
+    if logger === nothing 
+        logger = NullLogger()
+    end
+    
+    with_logger(logger) do
         _ellipsoid_algorithm!(f)
     end
 end
