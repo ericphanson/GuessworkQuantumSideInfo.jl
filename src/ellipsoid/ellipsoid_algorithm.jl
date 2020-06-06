@@ -332,13 +332,13 @@ function _ellipsoid_algorithm!(f::EllipsoidProblem{T}) where {T}
         # Update ellipsoid center
         @timeit timer "update center" begin
             g̃ = (1 / γ) * g
-            Pg̃ = P * g̃
+            Pg̃ = Hermitian(P) * g̃
             x .= x - (1 + n*α)*inv(n + 1) * Pg̃
         end
 
         # Update ellipsoid shape
         @timeit timer "update shape" begin
-            P .= (n^2 / (n^2 - 1)) * (1 - α^2)*(P - 2*(1 + n*α) / ((n+1)*(1+α)) * Pg̃ * transpose(Pg̃))
+            P .= (n^2 / (n^2 - 1)) * (1 - α^2)*(Hermitian(P) - 2*(1 + n*α) / ((n+1)*(1+α)) * Hermitian(Pg̃ * transpose(Pg̃)))
         end
 
         iter[] += 1
