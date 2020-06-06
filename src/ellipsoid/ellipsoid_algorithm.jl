@@ -297,7 +297,12 @@ function _ellipsoid_algorithm!(f::EllipsoidProblem{T}) where {T}
         end
         
         # How big is our ellipsoid?
-        vol = vol0 * sqrt(det(Hermitian(P)))
+        dt = det(Hermitian(P))
+        if dt >= 0
+            vol = vol0 * sqrt(dt)
+        else
+            vol = NaN
+        end
 
         @info "Iteration" iter[] vol γ feasible f_val f_best[] method α
         @timeit timer "Trace logging" begin
