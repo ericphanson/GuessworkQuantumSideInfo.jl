@@ -1,14 +1,18 @@
 
 function separation_oracle(prob::EllipsoidProblem{T}, Y) where {T}
-    @unpack c, p, ρBs, timer = prob
+    @unpack c, p, ρBs, timer, simplex_relaxation_degrees = prob
     J = length(p)
 
     # Simple feasability check
     @timeit timer "simplex_relaxation" begin
-        state = simplex_relaxation(prob, Y)
-    end
-    if state == FEASIBLE
-        return (status=FEASIBLE, RY=nothing, π=nothing, method=:simplex_relaxation)
+        for k ∈ simplex_relaxation_degrees
+            @timeit timer "degree $k" begin
+                state = simplex_relaxation(prob, Y, k)
+                if state == FEASIBLE
+                    return (status=FEASIBLE, RY=nothing, π=nothing, method=Symbol("simplex_relaxation_k=$k"))
+                end
+            end
+        end
     end
 
     # Now try to find a cut via simulated annealing
@@ -27,30 +31,20 @@ function separation_oracle(prob::EllipsoidProblem{T}, Y) where {T}
     return (; result..., method=:global_optimization)
 end
 
-
-# To check feasability, we wish to check that
-# `S := [ sum( c[π[x]]*p[x]*ρBs[x] for x = 1:J ) - Y for π in permutations(1:J) ] ⊆ PSD`
-# We relax this problem by considering a larger set which is simpler to construct:
-# `S̃ := [ sum( c̃[i] *p[x]*ρBs[x] for x = 1:J ) - Y for c̃[i] >= 1, sum(c̃) == sum(c) ]`
-# Since `S ⊆ S̃`, if `S̃ ⊆ PSD`, then `S` is too.
-# Moreover, the latter is a polytope (as the composition of affine maps applied to 
-# the standard simplex), so we may simply check that its extreme points lie in the PSD cone.
-function simplex_relaxation(prob::EllipsoidProblem{T}, Y) where {T}
+# If for any distinct indices i_1,...,i_k of {1,...,J} we have Y <= c_J rho_{i_1} + c_{J-1} rho_{i_2} + ... + c_{J-k+1} rho_{i_k} + c_1 sum_{i \neq i_j} rho_i, then Y is feasible.
+function simplex_relaxation(prob::EllipsoidProblem{T}, Y, k::Int) where {T}
     @unpack c, p, ρBs = prob
     J = length(p)
-    c_tot = sum(c)
-    c_max = c_tot - (J - 1) * c[1]
-    for x = 1:J
-        extremal_pt = p[x] * ρBs[x] * c_max + sum(p[y] * ρBs[y] * c[1] for y = 1:J if y ≠ x)
-        e = eigmin(Hermitian(extremal_pt - Y))
+    for inds in permutations(1:J, k)
+        R = sum(c[J .- (0:(k-1))] .* p[inds] .* ρBs[inds]) + c[1]* sum(p[x]*ρBs[x] for x = 1:J if x ∉ inds)
+        e = eigmin(Hermitian(R-Y))
         if e < 0
-            # simplex relaxation is not feasible; discrete problem may or may not be
             return UNKNOWN
         end
     end
-    # simplex relaxation is feasible, so discrete problem is too
     return FEASIBLE
 end
+
 
 # Heuristically try to find a cut via simulated annealing
 function SA_find_cut(prob::EllipsoidProblem{T}, Y) where {T}
@@ -110,7 +104,6 @@ function SA_find_cut(prob::EllipsoidProblem{T}, Y) where {T}
     end
 end
 
-
 # We aim to solve the non-linear problem
 # `min_π,ψ  <ψ, (sum( c[π[x]]*p[x]*ρBs[x] for x = 1:J ) - Y) ψ>`.
 # We can relax the discrete constraints that
@@ -155,6 +148,10 @@ function true_feasiblity(prob, Y)
         # t2 = <ψ, Y ψ>, exploiting that this quantity is real
         @NLexpression(m, t2, sum(ψ_re[l] * Y_re[l,k] * ψ_re[k] - ψ_re[l] * Y_im[l,k] * ψ_im[k] + ψ_im[l]*Y_im[l,k] *ψ_re[k] + ψ_im[l] * Y_re[l,k]*ψ_im[k] for l = 1:dB, k = 1:dB))
         @NLobjective(m, Min, t1 - t2)
+        # @NLobjective(m, Min, (sum(ψ_re[l] * R_re[l,k] * ψ_re[k] - ψ_re[l] * R_im[l,k] * ψ_im[k] + ψ_im[l]*R_im[l,k] *ψ_re[k] + ψ_im[l] * R_re[l,k]*ψ_im[k] for l = 1:dB, k = 1:dB)) - sum(ψ_re[l] * Y_re[l,k] * ψ_re[k] - ψ_re[l] * Y_im[l,k] * ψ_im[k] + ψ_im[l]*Y_im[l,k] *ψ_re[k] + ψ_im[l] * Y_re[l,k]*ψ_im[k] for l = 1:dB, k = 1:dB))
+        # @variable(m, -1 <= obj <= 1)
+        # @NLconstraint(m, obj >= t1 - t2)
+        # @objective(m, Min, obj)
     end
     @timeit timer "optimize!" JuMP.optimize!(m)
 

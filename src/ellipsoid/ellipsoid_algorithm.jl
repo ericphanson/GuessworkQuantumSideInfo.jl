@@ -90,7 +90,7 @@ See [`guesswork_ellipsoid`](@ref) for the possible keyword arguments
 for constructing an `EllipsoidProblem`, which may be constructed by e.g.
 `EllipsoidProblem(p, ρBs; nl_solver = ..., kwargs...)`.
 """
-Base.@kwdef struct EllipsoidProblem{T1,T,TρBs,Tc,Tm,TT,L, TTimer, NLS, TTrace, I, F}
+Base.@kwdef struct EllipsoidProblem{T1,T,TρBs,Tc,Tm,TT,L, TTimer, NLS, TTrace, I, F, SRD}
     x::Vector{T1}
     x_best::Vector{T1}
     P::Matrix{T1}
@@ -117,6 +117,7 @@ Base.@kwdef struct EllipsoidProblem{T1,T,TρBs,Tc,Tm,TT,L, TTimer, NLS, TTrace, 
     iter::I
     f_best::F
     max_time::Base.RefValue{Millisecond}
+    simplex_relaxation_degrees::SRD
 end
 
 function EllipsoidProblem(
@@ -146,6 +147,7 @@ function EllipsoidProblem(
     f_best = Ref(T(Inf)),
     tracelog = [],
     max_time::TimePeriod = Millisecond(typemax(Int)),
+    simplex_relaxation_degrees = 1:round(Int, sqrt(length(p)))
 ) where {T}
 
     length(p) == length(ρBs) ||
@@ -198,6 +200,7 @@ function EllipsoidProblem(
         iter=iter,
         f_best=f_best,
         max_time = max_time,
+        simplex_relaxation_degrees=simplex_relaxation_degrees
     )
 end
 

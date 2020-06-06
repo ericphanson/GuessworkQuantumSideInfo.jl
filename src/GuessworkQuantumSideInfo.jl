@@ -4,6 +4,7 @@ using Dates, LinearAlgebra, Logging, SparseArrays # standard libraries
 using Random: randperm! # standard library
 using Convex # Julia SDP solvers / interfaces
 using Combinatorics: multiset_permutations, combinations # used for POVM outcomes
+using Combinatorics: permutations # used in the simplex relaxation in the ellipsoid method oracle
 using UnPack: @unpack # helper
 
 # Used in the ellipsoid method implementation:
