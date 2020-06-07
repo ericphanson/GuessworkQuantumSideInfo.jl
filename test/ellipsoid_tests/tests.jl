@@ -33,7 +33,6 @@ using Serialization
     @test sol.prob.p ≈ re_sol.prob.p
     @test sol.prob.ρBs ≈ re_sol.prob.ρBs
     @test sol.optval ≈ re_sol.optval rtol=1e-2
-    @test sol.prob.x ≈ re_sol.prob.x rtol=1e-2
 end
 
 

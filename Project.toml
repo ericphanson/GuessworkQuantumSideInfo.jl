@@ -29,6 +29,7 @@ UnPack = "0.1, 1.0"
 julia = "1.1"
 
 [extras]
+Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
 GenericLinearAlgebra = "14197337-ba66-59df-a3e3-ca00e7dcff7a"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 SCS = "c946c3f1-0d1f-5ce8-9dea-7daa1f7e2d13"
@@ -36,4 +37,4 @@ Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Random", "Test", "Statistics", "SCS", "GenericLinearAlgebra"]
+test = ["Random", "Test", "Statistics", "SCS", "GenericLinearAlgebra", "Aqua"]

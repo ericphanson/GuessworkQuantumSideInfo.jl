@@ -15,6 +15,15 @@ if TEST_MATLAB
     include("test_matlab.jl")
 end
 
+# Performs various generic checks
+using Aqua
+Aqua.test_unbound_args(GuessworkQuantumSideInfo)
+Aqua.test_undefined_exports(GuessworkQuantumSideInfo)
+
+# This hangs:
+# Aqua.test_ambiguities(GuessworkQuantumSideInfo)
+# Probably https://github.com/JuliaLang/julia/issues/35909
+
 @testset "Utilities" begin
     @testset "Hermitian basis" begin
         for T in (Float64, BigFloat)
@@ -60,6 +69,11 @@ end
                 D_reconstruct += α_i * P_i
             end
             @test D_reconstruct ≈ D
+
+            # Make sure `collect` works (tests length etc)
+            results = collect(PermutationIterator(D))
+            D_reconstruct2 = sum(α*I(d)[π, :] for (π, α) in results)
+            @test D_reconstruct2 ≈ D
         end
     end
 end
