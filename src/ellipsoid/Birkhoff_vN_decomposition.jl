@@ -28,9 +28,8 @@ end
 @test D_reconstruct ≈ D
 ```
 """
-@Base.kwdef struct PermutationIterator{T1, T2, TTimer, V}
+@Base.kwdef struct PermutationIterator{T1, T2, TTimer}
     D::T1
-    αs::V = eltype(D)[]
     rtol::T2 = 1e-6
     timer::TTimer = nothing
 end
@@ -42,15 +41,15 @@ Base.IteratorEltype(::PermutationIterator) = Base.HasEltype()
 Base.eltype(::PermutationIterator) = Tuple{Vector{Int}, Float64}
 
 function Base.iterate(PI::PermutationIterator)
-    state = PI.D
-    empty!(PI.αs)
+    αs = eltype(PI.D)[]
+    state = (PI.D, αs)
     iterate(PI, state)
 end
 
 function Base.iterate(PI::PermutationIterator, state)
     state === nothing && return nothing
-    D = state
-    @unpack rtol, timer, αs = PI
+    D, αs = state
+    @unpack rtol, timer = PI
 
     # Find the maximum weight permutation
     if timer === nothing
@@ -77,7 +76,7 @@ function Base.iterate(PI::PermutationIterator, state)
         for i = 1:n
             D1[i, π[i]] -= α0
         end
-        return (π, c*α0), D1/(1-α0)
+        return (π, c*α0), (D1/(1-α0), αs)
     end
 end
 
