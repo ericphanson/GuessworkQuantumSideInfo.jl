@@ -26,6 +26,7 @@ makedocs(;
 
 deploydocs(;
     repo="github.com/ericphanson/GuessworkQuantumSideInfo.jl",
+    push_preview = true
 )
 
 ENV["GKSwstype"] = previous_GKSwstype;
