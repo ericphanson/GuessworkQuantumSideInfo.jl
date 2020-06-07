@@ -36,4 +36,30 @@ using Serialization
     @test sol.prob.x ≈ re_sol.prob.x rtol=1e-2
 end
 
+
+using Dates, MathOptInterface, Logging
+const MOI = MathOptInterface
+@testset "max time, verbose, logger" begin
+    p = ones(2)/2
+    ρBs = [ randdm(2) for _ = 1:2]
+    result = guesswork_ellipsoid(p, ρBs, nl_solver = nl_solver(), max_time = Millisecond(1))
+    @test result.status == MOI.TIME_LIMIT
+
+    # Resume solve and finish
+    result2 = GuessworkQuantumSideInfo.ellipsoid_algorithm!(result.prob, max_time = Hour(1))
+    @test result2.status == MOI.OPTIMAL
+
+    sdp_result = guesswork(p, ρBs; solver = default_sdp_solver())
+    @test result2.optval ≈ sdp_result.optval rtol=1e-2
+
+    # Try verbose = false
+    result3 = guesswork_ellipsoid(p, ρBs, nl_solver = nl_solver(), verbose=false)
+    @test result3.optval ≈ sdp_result.optval rtol=1e-2
+
+    # Try with a logger
+    result3 = guesswork_ellipsoid(p, ρBs, nl_solver = nl_solver(), logger=ConsoleLogger())
+    @test result3.optval ≈ sdp_result.optval rtol=1e-2
+end
+
+
 include("../test_problems.jl")
