@@ -16,7 +16,6 @@ this computes the value guesswork SDP. Keyword arguments are:
 * `timer_log_interval::Millisecond = Millisecond(1)*1e4`: how often to print timing information
 * `logger = nothing`: provide a logger (such as via TensorBoardLogger.jl) to log
   information during a run.
-* `normal_cone_tol = 0.0`: absolute tolerance to decide if a number is negative for the purpose of computing an element in the normal cone
 * `perm_tol = 1e-4`: a relative tolerance to decide if a number is `1` for the purpose of finding permutations in the support of a doubly stochastic matrix
 * `init_noise = 1e-6`: an amount of noise to add to the initial point to reduce symmetries
 * `trace = true`: whether or not to store a trace of the center and shape of the ellipsoid, along with other parameters, at each step
@@ -59,7 +58,7 @@ function default_init(p, ρBs, c, dB, init_noise)
     ρB = sum(p[x] * ρBs[x] for x in eachindex(p))
 
     Y_0 = c[1] * ρB
-    x_0 = invherm(Y_0)
+    x_0 = herm_to_vec(Y_0)
 
     # In semidefinite order,
     # 0 <= Y - Y_0 <= c[end]*I(dB^2) - Y_0
@@ -136,7 +135,6 @@ function EllipsoidProblem(
     x_best = nothing,
     P = nothing,
     tol = 1e-3,
-    normal_cone_tol = 0.0,
     perm_tol = 1e-4,
     init_noise = 1e-6,
     timer = TimerOutput(),
@@ -186,7 +184,6 @@ function EllipsoidProblem(
         debug = debug,
         trace = trace,
         tol = Ref(tol),
-        normal_cone_tol = Ref(normal_cone_tol),
         perm_tol = Ref(perm_tol),
         timer=timer,
         nl_solver = nl_solver,
@@ -236,7 +233,7 @@ function ellipsoid_algorithm!(
 end
 
 function _ellipsoid_algorithm!(f::EllipsoidProblem{T}) where {T}
-    @unpack dB, x, P, timer, normal_cone_tol, verbose, tracelog, trace, deepcut = f
+    @unpack dB, x, P, timer, verbose, tracelog, trace, deepcut = f
     @unpack iter, f_best, x_best, max_time, timer_log_interval = f
 
     tol = f.tol[]
@@ -259,7 +256,7 @@ function _ellipsoid_algorithm!(f::EllipsoidProblem{T}) where {T}
 
         # All the hard work happens here
         @timeit timer "separation_oracle" begin
-            @unpack status, RY, π, method = separation_oracle(f, herm(x))
+            @unpack status, RY, π, method = separation_oracle(f, vec_to_herm(x))
         end
 
         feasible = status == FEASIBLE
@@ -267,15 +264,15 @@ function _ellipsoid_algorithm!(f::EllipsoidProblem{T}) where {T}
         if !feasible
             # Constraint cut
             push!(f.cuts, π)
-            g = -invherm(normal_cone_element(PSD(), RY; tol = normal_cone_tol[]))
+            g = herm_to_vec(find_cut(PSD(), RY))
         else
             # objective cut
-            g = invherm(-I(dB)) # derivative of -tr(Y)
+            g = herm_to_vec(-I(dB)) # derivative of -tr(Y)
         end
     
         γ2 = dot(g, P, g)
         if γ2 < 0
-            Y = herm(x_best) # return the best feasible point we've found
+            Y = vec_to_herm(x_best) # return the best feasible point we've found
             return (status = MOI.NUMERICAL_ERROR, optval = tr(Y), Y=Y,
                     p = f.p, ρBs = f.ρBs, c = f.c,
                     J = length(f.p), K = length(f.p), prob=f)
@@ -288,7 +285,7 @@ function _ellipsoid_algorithm!(f::EllipsoidProblem{T}) where {T}
             constraint_violation = -eigmin(RY)
             α = deepcut ? min(constraint_violation / γ, .9) : 0
         else
-            f_val = -tr(herm(x))
+            f_val = -tr(vec_to_herm(x))
             if f_best[] > f_val
                 f_best[] = f_val
                 x_best .= x
@@ -312,7 +309,7 @@ function _ellipsoid_algorithm!(f::EllipsoidProblem{T}) where {T}
 
         # Exit condition
         if feasible && γ ≤ tol
-            Y = herm(x)
+            Y = vec_to_herm(x)
             return (status = MOI.OPTIMAL, optval = tr(Y), Y=Y,
                     p = f.p, ρBs = f.ρBs, c = f.c,
                     J = length(f.p), K = length(f.p), prob=f)
@@ -320,7 +317,7 @@ function _ellipsoid_algorithm!(f::EllipsoidProblem{T}) where {T}
 
         # Early stopping if max time exceeded
         if now() - t_init >= max_time[]
-            Y = herm(x)
+            Y = vec_to_herm(x)
             if verbose
                 println("Warning: hit maximum time, stopping early.")
             end
@@ -348,19 +345,19 @@ end
 struct Orthant end
 struct PSD end
 
-function normal_cone_element(::Orthant, λ::AbstractVector; tol::Number)
+function find_cut(::Orthant, λ::AbstractVector)
     z = zeros(length(λ))
     for i in eachindex(λ)
-        if real(λ[i]) <= tol
-            z[i] = -1
+        if real(λ[i]) < 0
+            z[i] = 1
         end
     end
     return z
 end
 
-function normal_cone_element(::PSD, P::AbstractMatrix; tol::Number)
+function find_cut(::PSD, P::AbstractMatrix)
     λ, Q = eigen(P)
-    Q * Diagonal(normal_cone_element(Orthant(), λ; tol=tol)) * Q'
+    Q * Diagonal(find_cut(Orthant(), λ)) * Q'
 end
 
 
@@ -375,23 +372,23 @@ end
 # is an isometry w/r/t/ the 2-norm on ℝ^{d^2} and the 2-norm (Frobenius norm) on ℍ_d.
 
 """
-    invherm(M::AbstractMatrix) -> Vector
+    herm_to_vec(M::AbstractMatrix) -> Vector
 
 Creates a real vector `v` representation of a
 complex Hermitian matrix `M`. These are related
 by a linear isometry (with respect to the 2-norm).
-See also [`herm`](@ref).
+See also [`vec_to_herm`](@ref).
 
 ## Example
 
 ```julia
 M = Hermitian(rand(4,4) + im*rand(4,4))
-v = invherm(M)
+v = herm_to_vec(M)
 
 norm(v, 2) ≈ norm(M, 2)
 ```
 """
-function invherm(M::AbstractMatrix)
+function herm_to_vec(M::AbstractMatrix)
     d = size(M, 1)
     @assert size(M) == (d, d)
     v = zeros(real(eltype(M)), d^2)
@@ -413,22 +410,22 @@ function invherm(M::AbstractMatrix)
 end
 
 """
-    herm(M::AbstractVector) -> Hermitian
+    vec_to_herm(M::AbstractVector) -> Hermitian
 
 Creates the complex Hermitian matrix `M` represented
 by the real vector `v`. 
-See also [`invherm`](@ref).
+See also [`herm_to_vec`](@ref).
 
 ## Example
 
 ```julia
 v = rand(16)
-M = herm(M)
+M = vec_to_herm(M)
 
 norm(v, 2) ≈ norm(M, 2)
 ```
 """
-function herm(v::AbstractVector)
+function vec_to_herm(v::AbstractVector)
     d = isqrt(length(v))
     @assert d^2 == length(v)
     M = zeros(complex(eltype(v)), d, d)

@@ -1,7 +1,7 @@
 using Test, GuessworkQuantumSideInfo, LinearAlgebra, Statistics, Random, UnPack
 using GenericLinearAlgebra
 using SCS
-using GuessworkQuantumSideInfo: herm, invherm, PermutationIterator
+using GuessworkQuantumSideInfo: vec_to_herm, herm_to_vec, PermutationIterator
 
 TEST_MATLAB = false # requires MATLAB and MATLAB.jl installed
 TEST_MISDP = false # requires Pajarito or another MISDP solver
@@ -23,34 +23,48 @@ Aqua.test_undefined_exports(GuessworkQuantumSideInfo)
 # This hangs:
 # Aqua.test_ambiguities(GuessworkQuantumSideInfo)
 # Probably https://github.com/JuliaLang/julia/issues/35909
-
+rand_vec(T, n) = rand(T, n) - rand(T, n)
+rand_herm(T, d) = Hermitian(rand(T, d,d) - rand(T, d, d) + im*( rand(T, d,d) - rand(T, d, d)))
 @testset "Utilities" begin
     @testset "Hermitian basis" begin
         for T in (Float64, BigFloat)
             for d in (2,3,5)
-                v = rand(T, d^2) - rand(T, d^2)
-                M = herm(v)
+                v = rand_vec(T, d^2)
+                M = vec_to_herm(v)
                 # Isometry
                 @test norm(v, 2) ≈ norm(M, 2)
                 # Maps to Hermitian
                 @test M isa Hermitian
                 # Roundtrips
-                @test v ≈ invherm(M)
+                @test v ≈ herm_to_vec(M)
                 # Linear
-                v2 = rand(T, d^2) - rand(T, d^2)
+                v2 = rand_vec(T, d^2)
                 λ = rand(T) - rand(T)
-                @test herm(v + λ*v2) ≈ herm(v) + λ*herm(v2)
+                @test vec_to_herm(v + λ*v2) ≈ vec_to_herm(v) + λ*vec_to_herm(v2)
 
                 # Test the other direction
-                M = Hermitian(rand(T, d,d) - rand(T, d, d) + im*( rand(T, d,d) - rand(T, d, d)))
-                v = invherm(M)
+                M = rand_herm(T, d)
+                v = herm_to_vec(M)
                 @test norm(M, 2) ≈ norm(v,2)
                 @test eltype(v) <: Real
                 @test v isa AbstractVector
-                @test M ≈ herm(v)
-                M2 = Hermitian(rand(T, d,d) - rand(T, d, d) + im*( rand(T, d,d) - rand(T, d, d)))
+                @test M ≈ vec_to_herm(v)
+                M2 = rand_herm(T, d)
                 λ = rand(T) - rand(T)
-                @test invherm(M + λ*M2) ≈ invherm(M) + λ*invherm(M2)
+                @test herm_to_vec(M + λ*M2) ≈ herm_to_vec(M) + λ*herm_to_vec(M2)
+
+                # Test inner product
+                M1 = rand_herm(T, d)
+                M2 = rand_herm(T, d)
+                v1 = herm_to_vec(M1)
+                v2 = herm_to_vec(M2)
+                @test tr(M1' * M2) ≈ dot(v1, v2)
+                v1 = rand_vec(T, d^2)
+                v2 = rand_vec(T, d^2)
+                M1 = vec_to_herm(v1)
+                M2 = vec_to_herm(v2)
+                @test tr(M1' * M2) ≈ dot(v1, v2)
+
             end
         end
     end

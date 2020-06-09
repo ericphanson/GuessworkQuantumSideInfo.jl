@@ -67,8 +67,8 @@ GuessworkQuantumSideInfo.pmfN
 ```@docs
 GuessworkQuantumSideInfo.default_init
 GuessworkQuantumSideInfo.EllipsoidProblem
-GuessworkQuantumSideInfo.invherm
-GuessworkQuantumSideInfo.herm
+GuessworkQuantumSideInfo.herm_to_vec
+GuessworkQuantumSideInfo.vec_to_herm
 GuessworkQuantumSideInfo.ellipsoid_algorithm!
 GuessworkQuantumSideInfo.PermutationIterator
 ```
