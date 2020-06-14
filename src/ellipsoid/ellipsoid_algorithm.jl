@@ -106,7 +106,6 @@ Base.@kwdef struct EllipsoidProblem{T1,T,TρBs,Tc,Tm,TT,TTimer,NLS,TTrace,I,F, S
     trace::Bool
     tracelog::TTrace
     tol::TT
-    normal_cone_tol::TT
     perm_tol::TT
     timer::TTimer
     nl_solver::NLS
