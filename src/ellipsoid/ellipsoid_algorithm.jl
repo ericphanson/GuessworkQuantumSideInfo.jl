@@ -9,7 +9,7 @@ this computes the value guesswork SDP. Keyword arguments are:
 
 * `nl_solver`: choice of nonlinear optimizer to use
 * `c::AbstractVector = T.(1:length(p))`: choice of cost vector
-* `deepcut = true`: whether to use "deep cuts" (can be faster)
+* `deepcut = false`: whether to use "deep cuts" (can be faster)
 * `tol = 1e-3`: solve tolerance (final value should be within `tol` of true solution)
 * `max_time::TimePeriod`: provide an approximate upper limit on the duration of the solve (defaults to unlimited)
 * `verbose::Bool = true`: whether to print timing information every so often to the terminal
@@ -128,7 +128,7 @@ function EllipsoidProblem(
     mutate! = rand_rev!,
     debug = false,
     trace = true,
-    deepcut = true,
+    deepcut = false,
     timer_log_interval::Millisecond = Millisecond(1)*1e4,
     x = nothing,
     x_best = nothing,
