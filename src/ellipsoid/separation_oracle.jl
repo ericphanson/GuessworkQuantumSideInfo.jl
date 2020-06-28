@@ -128,7 +128,7 @@ function true_feasiblity(prob, Y)
         Y_re = real.(Y)
         Y_im = imag.(Y)
 
-        m = Model(nl_solver)
+        m = Model(solver=nl_solver)
         # `D` is doubly stochastic:
         @variable(m, 0 <= D[i=1:J,j=1:J] <= 1)
         @constraint(m, sum(D, dims = 1) .== 1)
@@ -144,27 +144,28 @@ function true_feasiblity(prob, Y)
         @NLexpression(m, R_im[l=1:dB,k=1:dB], sum(c[j]*A_im[i][l,k]*D[i,j] for j = 1:J, i = 1:J))
 
         # t1 = <ψ, R ψ>, exploiting that this quantity is real
-        @NLexpression(m, t1, sum(ψ_re[l] * R_re[l,k] * ψ_re[k] - ψ_re[l] * R_im[l,k] * ψ_im[k] + ψ_im[l]*R_im[l,k] *ψ_re[k] + ψ_im[l] * R_re[l,k]*ψ_im[k] for l = 1:dB, k = 1:dB))
+        # @NLexpression(m, t1, sum(ψ_re[l] * R_re[l,k] * ψ_re[k] - ψ_re[l] * R_im[l,k] * ψ_im[k] + ψ_im[l]*R_im[l,k] *ψ_re[k] + ψ_im[l] * R_re[l,k]*ψ_im[k] for l = 1:dB, k = 1:dB))
         # t2 = <ψ, Y ψ>, exploiting that this quantity is real
-        @NLexpression(m, t2, sum(ψ_re[l] * Y_re[l,k] * ψ_re[k] - ψ_re[l] * Y_im[l,k] * ψ_im[k] + ψ_im[l]*Y_im[l,k] *ψ_re[k] + ψ_im[l] * Y_re[l,k]*ψ_im[k] for l = 1:dB, k = 1:dB))
-        @NLobjective(m, Min, t1 - t2)
-        # @NLobjective(m, Min, (sum(ψ_re[l] * R_re[l,k] * ψ_re[k] - ψ_re[l] * R_im[l,k] * ψ_im[k] + ψ_im[l]*R_im[l,k] *ψ_re[k] + ψ_im[l] * R_re[l,k]*ψ_im[k] for l = 1:dB, k = 1:dB)) - sum(ψ_re[l] * Y_re[l,k] * ψ_re[k] - ψ_re[l] * Y_im[l,k] * ψ_im[k] + ψ_im[l]*Y_im[l,k] *ψ_re[k] + ψ_im[l] * Y_re[l,k]*ψ_im[k] for l = 1:dB, k = 1:dB))
+        # @NLexpression(m, t2, sum(ψ_re[l] * Y_re[l,k] * ψ_re[k] - ψ_re[l] * Y_im[l,k] * ψ_im[k] + ψ_im[l]*Y_im[l,k] *ψ_re[k] + ψ_im[l] * Y_re[l,k]*ψ_im[k] for l = 1:dB, k = 1:dB))
+        # @NLobjective(m, Min, t1 - t2)
+        @NLobjective(m, Min, (sum(ψ_re[l] * R_re[l,k] * ψ_re[k] - ψ_re[l] * R_im[l,k] * ψ_im[k] + ψ_im[l]*R_im[l,k] *ψ_re[k] + ψ_im[l] * R_re[l,k]*ψ_im[k] for l = 1:dB, k = 1:dB)) - sum(ψ_re[l] * Y_re[l,k] * ψ_re[k] - ψ_re[l] * Y_im[l,k] * ψ_im[k] + ψ_im[l]*Y_im[l,k] *ψ_re[k] + ψ_im[l] * Y_re[l,k]*ψ_im[k] for l = 1:dB, k = 1:dB))
         # @variable(m, -1 <= obj <= 1)
         # @NLconstraint(m, obj >= t1 - t2)
         # @objective(m, Min, obj)
     end
-    @timeit timer "optimize!" JuMP.optimize!(m)
+    # @timeit timer "optimize!" JuMP.optimize!(m)
+    status = solve(m)
+    # if termination_status(m) != MOI.OPTIMAL
+    # if termination_status(m) != MOI.OPTIMAL
+    #     error("Problem was not solved optimally; status $(termination_status(m)).")
+    # end
 
-    if termination_status(m) != MOI.OPTIMAL
-        error("Problem was not solved optimally; status $(termination_status(m)).")
-    end
-
-    obj_value = objective_value(m)
+    obj_value = getobjectivevalue(m)
     feasible = obj_value >= 0
 
     @info "true_feasiblity" obj_value feasible
 
-    if objective_value(m) >= 0
+    if getobjectivevalue(m) >= 0
         return (status=FEASIBLE, RY=nothing, π=nothing)
     else
         # Time to find a cut

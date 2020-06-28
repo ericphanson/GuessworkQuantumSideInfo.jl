@@ -2,21 +2,25 @@ using Test, GuessworkQuantumSideInfo, LinearAlgebra, Statistics, Random, UnPack
 using GenericLinearAlgebra
 using SCS
 
-using EAGO, JuMP, MathOptInterface
+using Alpine, JuMP, MathOptInterface, Ipopt
+using Cbc
 
 const MOI = MathOptInterface
 
 TEST_MATLAB = false # requires MATLAB and MATLAB.jl installed
 TEST_MISDP = false # requires Pajarito or another MISDP solver
 TEST_BB84_MISDP = false # takes ~100 seconds; requires TEST_MISDP
-TEST_MOI = true # incompatible with the current version of Pajarito
+TEST_MOI = false # incompatible with the current version of Pajarito
 TEST_ELLIPSOID = true
+default_sdp_solver() = SCSSolver(verbose = 0, eps = 1e-6)
 
-default_sdp_solver() = SCS.Optimizer(verbose = 0, eps = 1e-6)
+using Gurobi
+const GRB_ENV = Gurobi.Env()
 
 function nl_solver()
     # EAGO.Optimizer
-    optimizer_with_attributes(EAGO.Optimizer, "verbosity" => 0)
+    # optimizer_with_attributes(EAGO.Optimizer, "verbosity" => 0)
+    AlpineSolver(nlp_solver=IpoptSolver(print_level=0), mip_solver=GurobiSolver(GRB_ENV; OutputFlag=0))
 end
 
 using GuessworkQuantumSideInfo: EllipsoidProblem

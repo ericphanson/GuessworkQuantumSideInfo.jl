@@ -1,8 +1,11 @@
 [deps]
+Alpine = "07493b3f-dabb-5b16-a503-4139292d7dd4"
+Cbc = "9961bab8-2fa3-5c5a-9d89-47fab24efd76"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
-EAGO = "bb8be931-2a91-5aca-9f87-79e1cb69959a"
 GenericLinearAlgebra = "14197337-ba66-59df-a3e3-ca00e7dcff7a"
 GuessworkQuantumSideInfo = "43bf2e5e-2e2b-4a4c-a80a-78ff5d909e07"
+Gurobi = "2e9cd046-0924-5485-92f1-d5272153d98b"
+Ipopt = "b6b21f68-93f8-5de0-b562-5493be1d77c9"
 JuMP = "4076af6c-e467-56ae-b986-b466b2749572"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Logging = "56ddb016-857b-54e1-b83d-db4d58db5568"
