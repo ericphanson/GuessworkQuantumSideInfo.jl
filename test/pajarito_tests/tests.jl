@@ -8,6 +8,7 @@ TEST_MATLAB = false # requires MATLAB and MATLAB.jl installed
 TEST_MISDP = true # requires Pajarito or another MISDP solver
 TEST_BB84_MISDP = false # takes ~100 seconds; requires TEST_MISDP
 TEST_MOI = false # incompatible with the current version of Pajarito
+TEST_ELLIPSOID = false
 
 default_sdp_solver() = SCSSolver(verbose = 0, eps = 1e-6)
 

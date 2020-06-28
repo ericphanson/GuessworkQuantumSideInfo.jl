@@ -42,6 +42,7 @@ output.optval
 GuessworkQuantumSideInfo.guesswork
 GuessworkQuantumSideInfo.guesswork_lower_bound
 GuessworkQuantumSideInfo.guesswork_upper_bound
+GuessworkQuantumSideInfo.guesswork_ellipsoid
 ```
 
 ## Quantum states
@@ -59,4 +60,15 @@ GuessworkQuantumSideInfo.randprobvec
 
 ```@docs
 GuessworkQuantumSideInfo.pmfN
+```
+
+## Ellipsoid algorithm functions
+
+```@docs
+GuessworkQuantumSideInfo.default_init
+GuessworkQuantumSideInfo.EllipsoidProblem
+GuessworkQuantumSideInfo.herm_to_vec
+GuessworkQuantumSideInfo.vec_to_herm
+GuessworkQuantumSideInfo.ellipsoid_algorithm!
+GuessworkQuantumSideInfo.PermutationIterator
 ```
