@@ -1,4 +1,4 @@
-using Test, GuessworkQuantumSideInfo, LinearAlgebra, Statistics, Random, UnPack
+using Test, GuessworkQuantumSideInfo, LinearAlgebra, Statistics, Random, UnPack, StableRNGs
 using GenericLinearAlgebra
 using SCS
 
