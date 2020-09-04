@@ -8,47 +8,59 @@ isfile(joinpath(@__DIR__, "results.csv")) && error("`results.csv` already exists
 
 include("common.jl")
 
-n_problems = length(problems)
-n_algos = length(algos)
-timeout = 120
-for problem_idx in 1:n_problems, algo_idx in 1:n_algos
+# The idea is these can be run in parallel, and the thunks that write to the CSV returned,
+# then those could be executed serially.
+# It's probably more robust to have each process write a separate one-line CSV
+# and then collect them at the end, though.
+function run_problem(algo_idx, problem_idx; verbose = true)
     algo = algos[algo_idx]
     prob = problems[problem_idx]
     out = Pipe()
     err = Pipe()
     proc = run(pipeline(`julia --project=$(@__DIR__) do_problem.jl $(algo_idx) $(problem_idx)`, stdout=out, stderr=err), wait=false)
     time_elapsed = 0.0
-    meter = Progress(timeout*2, desc = "Problem $problem_idx/$n_problems, algorithm $algo_idx/$n_algos ")
+    if verbose
+        meter = Progress(timeout*2, desc = "Problem $problem_idx/$n_problems, algorithm $algo_idx/$n_algos ")
+    end
     while time_elapsed < timeout && Base.process_running(proc)
         sleep(0.5)
-        next!(meter)
+        verbose && next!(meter)
         time_elapsed += 0.5
     end
-    finish!(meter)
+    verbose && finish!(meter)
     if Base.process_running(proc)
-        println("Timed out!")
+        verbose && println("Timed out!")
         Base.kill(proc)
        
-        write_results(algo, prob)
+        f = () -> write_results(algo, prob)
     else
-        println("Finished!")
+        verbose && println("Finished!")
         close(err.in)
         close(out.in)
         errors_text = String(read(err))
-        if !isempty(errors_text)
+        if !isempty(errors_text) && verbose
             @error errors_text
         end
         results = split(chomp(String(read(out))), '\n')
         warnings = false
         if length(results) > 2
-            @warn join(results[1:end-2], "\n")
+            verbose && @warn join(results[1:end-2], "\n")
             warnings = true
         end
-        @info results
+        verbose && @info results
         optval, elapsed = parse.(Float64, results[end-1:end])
-        write_results(algo, prob, optval, elapsed; errors = !isempty(errors_text), warnings)
+        f = () -> write_results(algo, prob, optval, elapsed; errors = !isempty(errors_text), warnings)
     end
-
+    return f
 end
+
+n_problems = length(problems)
+n_algos = length(algos)
+timeout = 60*5
+for problem_idx in 1:n_problems, algo_idx in 1:n_algos
+    f = run_problem(algo_idx, problem_idx; verbose = true)
+    f()
+end
+
 
 df = CSV.read(joinpath(@__DIR__, "results.csv"))
