@@ -1,6 +1,6 @@
 using ProgressMeter, CSV
-function write_results(algo, prob, optval = NaN, elapsed = NaN)
-    row = (;algo.algo, algo.settings, prob.numeric_type, prob.problem, optval, elapsed)
+function write_results(algo, prob, optval = NaN, elapsed_seconds = NaN; warnings = false, errors = false)
+    row = (;algo.algo, algo.settings, prob.numeric_type, prob.problem, optval, elapsed_seconds, warnings, errors)
     CSV.write(joinpath(@__DIR__, "results.csv"), [row], append = isfile(joinpath(@__DIR__, "results.csv")))
 end
 
@@ -31,21 +31,22 @@ for problem_idx in 1:n_problems, algo_idx in 1:n_algos
        
         write_results(algo, prob)
     else
-
         println("Finished!")
         close(err.in)
         close(out.in)
-
-        errors = String(read(err))
-        if !isempty(errors)
-            @error errors
+        errors_text = String(read(err))
+        if !isempty(errors_text)
+            @error errors_text
         end
-        results = split(String(read(out)), '\n')
+        results = split(chomp(String(read(out))), '\n')
+        warnings = false
         if length(results) > 2
             @warn join(results[1:end-2], "\n")
+            warnings = true
         end
+        @info results
         optval, elapsed = parse.(Float64, results[end-1:end])
-        write_results(algo, prob, optval, elapsed)
+        write_results(algo, prob, optval, elapsed; errors = !isempty(errors_text), warnings)
     end
 
 end
