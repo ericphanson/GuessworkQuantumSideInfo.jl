@@ -2,7 +2,7 @@
     guesswork_MISDP(
         p::AbstractVector{T},
         ρBs::AbstractVector{<:AbstractMatrix},
-        num_outcomes;
+        num_outcomes = size(ρBs[1], 1)^2 + 1;
         solver,
         c = T.(1:length(p)),
         verbose::Bool = true,
@@ -38,7 +38,7 @@ problem is not optimally solved.
 function guesswork_MISDP(
     p::AbstractVector{T},
     ρBs::AbstractVector{<:AbstractMatrix},
-    num_outcomes;
+    num_outcomes = size(ρBs[1], 1)^2 + 1;
     solver,
     c = T.(1:length(p)),
     verbose::Bool = true,
