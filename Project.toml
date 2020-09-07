@@ -1,7 +1,7 @@
 name = "GuessworkQuantumSideInfo"
 uuid = "43bf2e5e-2e2b-4a4c-a80a-78ff5d909e07"
 authors = ["Eric P. Hanson"]
-version = "0.1.1"
+version = "0.1.2"
 
 [deps]
 Combinatorics = "861a8166-3701-5b0c-9a16-15d98fcdc6aa"
