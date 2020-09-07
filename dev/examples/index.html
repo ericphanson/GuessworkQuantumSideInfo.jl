@@ -20,7 +20,7 @@ julia&gt; ρBs = dm.([ ketzero, ketzero  ])
 julia&gt; output = guesswork(p, ρBs; solver = get_sdp_solver());
 
 julia&gt; output.optval
-1.4999979195118784</code></pre><p>We see the result agrees with <code>1.5</code>, as we expected. Likewise, if we choose the two states as $ |0\rangle, |1\rangle$, we can get it in one guess every time, of course, since they are orthogonal:</p><pre><code class="language-julia-repl">julia&gt; p = [0.5, 0.5]
+1.5000105244940878</code></pre><p>We see the result agrees with <code>1.5</code>, as we expected. Likewise, if we choose the two states as $ |0\rangle, |1\rangle$, we can get it in one guess every time, of course, since they are orthogonal:</p><pre><code class="language-julia-repl">julia&gt; p = [0.5, 0.5]
 2-element Array{Float64,1}:
  0.5
  0.5
@@ -33,7 +33,7 @@ julia&gt; ρBs = dm.([ ketzero, ketone  ])
 julia&gt; output = guesswork(p, ρBs; solver = get_sdp_solver());
 
 julia&gt; output.optval
-0.9999976286547259</code></pre><p>We can inspect the POVMs:</p><pre><code class="language-julia-repl">julia&gt; output.Es
+0.9999976286547437</code></pre><p>We can inspect the POVMs:</p><pre><code class="language-julia-repl">julia&gt; output.Es
 2-element Array{Array{Complex{Float64},2},1}:
  [1.00001+0.0im 0.0+0.0im; 0.0+0.0im -4.72791e-6+0.0im]
  [-4.72791e-6+0.0im 0.0+0.0im; 0.0+0.0im 1.00001+0.0im]</code></pre><p>As we would expect, we (approximately) obtain the projection onto <span>$|0 \rangle$</span> and the projection onto <span>$|1 \rangle$</span>.</p><h2 id="Example-2:-the-BB84-states-1"><a class="docs-heading-anchor" href="#Example-2:-the-BB84-states-1">Example 2: the BB84 states</a><a class="docs-heading-anchor-permalink" href="#Example-2:-the-BB84-states-1" title="Permalink"></a></h2><p>Let&#39;s consider the four states <span>$|+ \rangle, |-\rangle, |0\rangle, |1\rangle$</span>.</p><pre><code class="language-julia-repl">julia&gt; p = [0.25, 0.25, 0.25, 0.25]
@@ -53,153 +53,153 @@ julia&gt; ρBs = dm.([ ketplus, ketminus, ketzero, ketone  ])
 julia&gt; output = guesswork(p, ρBs; solver = get_sdp_solver());
 
 julia&gt; output.optval
-1.7094223477177433</code></pre><pre><code class="language-julia">plot_pmfN(output)</code></pre><?xml version="1.0" encoding="utf-8"?>
+1.7094306690270955</code></pre><pre><code class="language-julia">plot_pmfN(output)</code></pre><?xml version="1.0" encoding="utf-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="600" height="400" viewBox="0 0 2400 1600">
 <defs>
-  <clipPath id="clip2600">
+  <clipPath id="clip6700">
     <rect x="0" y="0" width="2400" height="1600"/>
   </clipPath>
 </defs>
-<path clip-path="url(#clip2600)" d="
+<path clip-path="url(#clip6700)" d="
 M0 1600 L2400 1600 L2400 0 L0 0  Z
   " fill="#ffffff" fill-rule="evenodd" fill-opacity="1"/>
 <defs>
-  <clipPath id="clip2601">
+  <clipPath id="clip6701">
     <rect x="480" y="0" width="1681" height="1600"/>
   </clipPath>
 </defs>
-<path clip-path="url(#clip2600)" d="
+<path clip-path="url(#clip6700)" d="
 M215.754 1425.62 L2352.76 1425.62 L2352.76 47.2441 L215.754 47.2441  Z
   " fill="#ffffff" fill-rule="evenodd" fill-opacity="1"/>
 <defs>
-  <clipPath id="clip2602">
+  <clipPath id="clip6702">
     <rect x="215" y="47" width="2138" height="1379"/>
   </clipPath>
 </defs>
-<polyline clip-path="url(#clip2602)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+<polyline clip-path="url(#clip6702)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
   533.496,1425.62 533.496,47.2441 
   "/>
-<polyline clip-path="url(#clip2602)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+<polyline clip-path="url(#clip6702)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
   1034,1425.62 1034,47.2441 
   "/>
-<polyline clip-path="url(#clip2602)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+<polyline clip-path="url(#clip6702)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
   1534.51,1425.62 1534.51,47.2441 
   "/>
-<polyline clip-path="url(#clip2602)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+<polyline clip-path="url(#clip6702)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
   2035.01,1425.62 2035.01,47.2441 
   "/>
-<polyline clip-path="url(#clip2602)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+<polyline clip-path="url(#clip6702)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
   215.754,1386.61 2352.76,1386.61 
   "/>
-<polyline clip-path="url(#clip2602)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+<polyline clip-path="url(#clip6702)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
   215.754,1119.69 2352.76,1119.69 
   "/>
-<polyline clip-path="url(#clip2602)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
-  215.754,852.767 2352.76,852.767 
+<polyline clip-path="url(#clip6702)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  215.754,852.769 2352.76,852.769 
   "/>
-<polyline clip-path="url(#clip2602)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
-  215.754,585.846 2352.76,585.846 
+<polyline clip-path="url(#clip6702)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  215.754,585.85 2352.76,585.85 
   "/>
-<polyline clip-path="url(#clip2602)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
-  215.754,318.926 2352.76,318.926 
+<polyline clip-path="url(#clip6702)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  215.754,318.931 2352.76,318.931 
   "/>
-<polyline clip-path="url(#clip2602)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
-  215.754,52.0051 2352.76,52.0051 
+<polyline clip-path="url(#clip6702)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  215.754,52.0111 2352.76,52.0111 
   "/>
-<polyline clip-path="url(#clip2600)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip6700)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   215.754,1425.62 2352.76,1425.62 
   "/>
-<polyline clip-path="url(#clip2600)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip6700)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   215.754,1425.62 215.754,47.2441 
   "/>
-<polyline clip-path="url(#clip2600)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip6700)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   533.496,1425.62 533.496,1409.08 
   "/>
-<polyline clip-path="url(#clip2600)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip6700)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   1034,1425.62 1034,1409.08 
   "/>
-<polyline clip-path="url(#clip2600)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip6700)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   1534.51,1425.62 1534.51,1409.08 
   "/>
-<polyline clip-path="url(#clip2600)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip6700)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   2035.01,1425.62 2035.01,1409.08 
   "/>
-<polyline clip-path="url(#clip2600)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip6700)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   215.754,1386.61 241.398,1386.61 
   "/>
-<polyline clip-path="url(#clip2600)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip6700)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   215.754,1119.69 241.398,1119.69 
   "/>
-<polyline clip-path="url(#clip2600)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  215.754,852.767 241.398,852.767 
+<polyline clip-path="url(#clip6700)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  215.754,852.769 241.398,852.769 
   "/>
-<polyline clip-path="url(#clip2600)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  215.754,585.846 241.398,585.846 
+<polyline clip-path="url(#clip6700)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  215.754,585.85 241.398,585.85 
   "/>
-<polyline clip-path="url(#clip2600)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  215.754,318.926 241.398,318.926 
+<polyline clip-path="url(#clip6700)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  215.754,318.931 241.398,318.931 
   "/>
-<polyline clip-path="url(#clip2600)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
-  215.754,52.0051 241.398,52.0051 
+<polyline clip-path="url(#clip6700)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  215.754,52.0111 241.398,52.0111 
   "/>
-<g clip-path="url(#clip2600)">
+<g clip-path="url(#clip6700)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 533.496, 1479.62)" x="533.496" y="1479.62">1</text>
 </g>
-<g clip-path="url(#clip2600)">
+<g clip-path="url(#clip6700)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1034, 1479.62)" x="1034" y="1479.62">2</text>
 </g>
-<g clip-path="url(#clip2600)">
+<g clip-path="url(#clip6700)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1534.51, 1479.62)" x="1534.51" y="1479.62">3</text>
 </g>
-<g clip-path="url(#clip2600)">
+<g clip-path="url(#clip6700)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 2035.01, 1479.62)" x="2035.01" y="1479.62">4</text>
 </g>
-<g clip-path="url(#clip2600)">
+<g clip-path="url(#clip6700)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 191.754, 1404.11)" x="191.754" y="1404.11">0.0</text>
 </g>
-<g clip-path="url(#clip2600)">
+<g clip-path="url(#clip6700)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 191.754, 1137.19)" x="191.754" y="1137.19">0.1</text>
 </g>
-<g clip-path="url(#clip2600)">
-<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 191.754, 870.267)" x="191.754" y="870.267">0.2</text>
+<g clip-path="url(#clip6700)">
+<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 191.754, 870.269)" x="191.754" y="870.269">0.2</text>
 </g>
-<g clip-path="url(#clip2600)">
-<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 191.754, 603.346)" x="191.754" y="603.346">0.3</text>
+<g clip-path="url(#clip6700)">
+<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 191.754, 603.35)" x="191.754" y="603.35">0.3</text>
 </g>
-<g clip-path="url(#clip2600)">
-<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 191.754, 336.426)" x="191.754" y="336.426">0.4</text>
+<g clip-path="url(#clip6700)">
+<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 191.754, 336.431)" x="191.754" y="336.431">0.4</text>
 </g>
-<g clip-path="url(#clip2600)">
-<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 191.754, 69.5051)" x="191.754" y="69.5051">0.5</text>
+<g clip-path="url(#clip6700)">
+<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 191.754, 69.5111)" x="191.754" y="69.5111">0.5</text>
 </g>
-<g clip-path="url(#clip2600)">
+<g clip-path="url(#clip6700)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:66px; text-anchor:middle;" transform="rotate(0, 1284.25, 1559.48)" x="1284.25" y="1559.48">Guess number</text>
 </g>
-<g clip-path="url(#clip2600)">
+<g clip-path="url(#clip6700)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:66px; text-anchor:middle;" transform="rotate(-90, 89.2861, 736.431)" x="89.2861" y="736.431">Probability of guessing correctly</text>
 </g>
-<path clip-path="url(#clip2602)" d="
+<path clip-path="url(#clip6702)" d="
 M333.293 86.2547 L333.293 1386.61 L733.698 1386.61 L733.698 86.2547 L333.293 86.2547 L333.293 86.2547  Z
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip2602)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip6702)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   333.293,86.2547 333.293,1386.61 733.698,1386.61 733.698,86.2547 333.293,86.2547 
   "/>
-<path clip-path="url(#clip2602)" d="
+<path clip-path="url(#clip6702)" d="
 M833.799 508.291 L833.799 1386.61 L1234.2 1386.61 L1234.2 508.291 L833.799 508.291 L833.799 508.291  Z
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip2602)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip6702)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   833.799,508.291 833.799,1386.61 1234.2,1386.61 1234.2,508.291 833.799,508.291 
   "/>
-<path clip-path="url(#clip2602)" d="
+<path clip-path="url(#clip6702)" d="
 M1334.31 930.328 L1334.31 1386.61 L1734.71 1386.61 L1734.71 930.328 L1334.31 930.328 L1334.31 930.328  Z
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip2602)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip6702)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   1334.31,930.328 1334.31,1386.61 1734.71,1386.61 1734.71,930.328 1334.31,930.328 
   "/>
-<path clip-path="url(#clip2602)" d="
+<path clip-path="url(#clip6702)" d="
 M1834.81 1352.36 L1834.81 1386.61 L2235.22 1386.61 L2235.22 1352.36 L1834.81 1352.36 L1834.81 1352.36  Z
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip2602)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip6702)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   1834.81,1352.36 1834.81,1386.61 2235.22,1386.61 2235.22,1352.36 1834.81,1352.36 
   "/>
 </svg>
@@ -213,153 +213,153 @@ M1834.81 1352.36 L1834.81 1386.61 L2235.22 1386.61 L2235.22 1352.36 L1834.81 135
 julia&gt; output = guesswork(p, ρBs; c = c, solver = get_sdp_solver());
 
 julia&gt; output.optval
-1.749975128980195</code></pre><p>We see that the average number of guesses to get a correct answer has gone up. However, inspecting the probability mass function for the number of guesses under the optimal strategy</p><pre><code class="language-julia">plot_pmfN(output)</code></pre><?xml version="1.0" encoding="utf-8"?>
+1.7499750650637333</code></pre><p>We see that the average number of guesses to get a correct answer has gone up. However, inspecting the probability mass function for the number of guesses under the optimal strategy</p><pre><code class="language-julia">plot_pmfN(output)</code></pre><?xml version="1.0" encoding="utf-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="600" height="400" viewBox="0 0 2400 1600">
 <defs>
-  <clipPath id="clip3200">
+  <clipPath id="clip7300">
     <rect x="0" y="0" width="2400" height="1600"/>
   </clipPath>
 </defs>
-<path clip-path="url(#clip3200)" d="
+<path clip-path="url(#clip7300)" d="
 M0 1600 L2400 1600 L2400 0 L0 0  Z
   " fill="#ffffff" fill-rule="evenodd" fill-opacity="1"/>
 <defs>
-  <clipPath id="clip3201">
+  <clipPath id="clip7301">
     <rect x="480" y="0" width="1681" height="1600"/>
   </clipPath>
 </defs>
-<path clip-path="url(#clip3200)" d="
+<path clip-path="url(#clip7300)" d="
 M215.754 1425.62 L2352.76 1425.62 L2352.76 47.2441 L215.754 47.2441  Z
   " fill="#ffffff" fill-rule="evenodd" fill-opacity="1"/>
 <defs>
-  <clipPath id="clip3202">
+  <clipPath id="clip7302">
     <rect x="215" y="47" width="2138" height="1379"/>
   </clipPath>
 </defs>
-<polyline clip-path="url(#clip3202)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+<polyline clip-path="url(#clip7302)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
   533.496,1425.62 533.496,47.2441 
   "/>
-<polyline clip-path="url(#clip3202)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+<polyline clip-path="url(#clip7302)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
   1034,1425.62 1034,47.2441 
   "/>
-<polyline clip-path="url(#clip3202)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+<polyline clip-path="url(#clip7302)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
   1534.51,1425.62 1534.51,47.2441 
   "/>
-<polyline clip-path="url(#clip3202)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+<polyline clip-path="url(#clip7302)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
   2035.01,1425.62 2035.01,47.2441 
   "/>
-<polyline clip-path="url(#clip3202)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+<polyline clip-path="url(#clip7302)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
   215.754,1386.61 2352.76,1386.61 
   "/>
-<polyline clip-path="url(#clip3202)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+<polyline clip-path="url(#clip7302)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
   215.754,1126.54 2352.76,1126.54 
   "/>
-<polyline clip-path="url(#clip3202)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+<polyline clip-path="url(#clip7302)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
   215.754,866.467 2352.76,866.467 
   "/>
-<polyline clip-path="url(#clip3202)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+<polyline clip-path="url(#clip7302)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
   215.754,606.396 2352.76,606.396 
   "/>
-<polyline clip-path="url(#clip3202)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+<polyline clip-path="url(#clip7302)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
   215.754,346.325 2352.76,346.325 
   "/>
-<polyline clip-path="url(#clip3202)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+<polyline clip-path="url(#clip7302)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
   215.754,86.2547 2352.76,86.2547 
   "/>
-<polyline clip-path="url(#clip3200)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip7300)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   215.754,1425.62 2352.76,1425.62 
   "/>
-<polyline clip-path="url(#clip3200)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip7300)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   215.754,1425.62 215.754,47.2441 
   "/>
-<polyline clip-path="url(#clip3200)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip7300)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   533.496,1425.62 533.496,1409.08 
   "/>
-<polyline clip-path="url(#clip3200)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip7300)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   1034,1425.62 1034,1409.08 
   "/>
-<polyline clip-path="url(#clip3200)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip7300)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   1534.51,1425.62 1534.51,1409.08 
   "/>
-<polyline clip-path="url(#clip3200)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip7300)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   2035.01,1425.62 2035.01,1409.08 
   "/>
-<polyline clip-path="url(#clip3200)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip7300)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   215.754,1386.61 241.398,1386.61 
   "/>
-<polyline clip-path="url(#clip3200)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip7300)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   215.754,1126.54 241.398,1126.54 
   "/>
-<polyline clip-path="url(#clip3200)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip7300)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   215.754,866.467 241.398,866.467 
   "/>
-<polyline clip-path="url(#clip3200)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip7300)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   215.754,606.396 241.398,606.396 
   "/>
-<polyline clip-path="url(#clip3200)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip7300)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   215.754,346.325 241.398,346.325 
   "/>
-<polyline clip-path="url(#clip3200)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip7300)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   215.754,86.2547 241.398,86.2547 
   "/>
-<g clip-path="url(#clip3200)">
+<g clip-path="url(#clip7300)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 533.496, 1479.62)" x="533.496" y="1479.62">1</text>
 </g>
-<g clip-path="url(#clip3200)">
+<g clip-path="url(#clip7300)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1034, 1479.62)" x="1034" y="1479.62">2</text>
 </g>
-<g clip-path="url(#clip3200)">
+<g clip-path="url(#clip7300)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1534.51, 1479.62)" x="1534.51" y="1479.62">3</text>
 </g>
-<g clip-path="url(#clip3200)">
+<g clip-path="url(#clip7300)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 2035.01, 1479.62)" x="2035.01" y="1479.62">4</text>
 </g>
-<g clip-path="url(#clip3200)">
+<g clip-path="url(#clip7300)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 191.754, 1404.11)" x="191.754" y="1404.11">0.0</text>
 </g>
-<g clip-path="url(#clip3200)">
+<g clip-path="url(#clip7300)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 191.754, 1144.04)" x="191.754" y="1144.04">0.1</text>
 </g>
-<g clip-path="url(#clip3200)">
+<g clip-path="url(#clip7300)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 191.754, 883.967)" x="191.754" y="883.967">0.2</text>
 </g>
-<g clip-path="url(#clip3200)">
+<g clip-path="url(#clip7300)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 191.754, 623.896)" x="191.754" y="623.896">0.3</text>
 </g>
-<g clip-path="url(#clip3200)">
+<g clip-path="url(#clip7300)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 191.754, 363.825)" x="191.754" y="363.825">0.4</text>
 </g>
-<g clip-path="url(#clip3200)">
+<g clip-path="url(#clip7300)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 191.754, 103.755)" x="191.754" y="103.755">0.5</text>
 </g>
-<g clip-path="url(#clip3200)">
+<g clip-path="url(#clip7300)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:66px; text-anchor:middle;" transform="rotate(0, 1284.25, 1559.48)" x="1284.25" y="1559.48">Guess number</text>
 </g>
-<g clip-path="url(#clip3200)">
+<g clip-path="url(#clip7300)">
 <text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:66px; text-anchor:middle;" transform="rotate(-90, 89.2861, 736.431)" x="89.2861" y="736.431">Probability of guessing correctly</text>
 </g>
-<path clip-path="url(#clip3202)" d="
+<path clip-path="url(#clip7302)" d="
 M333.293 86.2547 L333.293 1386.61 L733.698 1386.61 L733.698 86.2547 L333.293 86.2547 L333.293 86.2547  Z
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip3202)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip7302)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   333.293,86.2547 333.293,1386.61 733.698,1386.61 733.698,86.2547 333.293,86.2547 
   "/>
-<path clip-path="url(#clip3202)" d="
+<path clip-path="url(#clip7302)" d="
 M833.799 736.301 L833.799 1386.61 L1234.2 1386.61 L1234.2 736.301 L833.799 736.301 L833.799 736.301  Z
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip3202)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip7302)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   833.799,736.301 833.799,1386.61 1234.2,1386.61 1234.2,736.301 833.799,736.301 
   "/>
-<path clip-path="url(#clip3202)" d="
+<path clip-path="url(#clip7302)" d="
 M1334.31 736.561 L1334.31 1386.61 L1734.71 1386.61 L1734.71 736.561 L1334.31 736.561 L1334.31 736.561  Z
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip3202)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip7302)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   1334.31,736.561 1334.31,1386.61 1734.71,1386.61 1734.71,736.561 1334.31,736.561 
   "/>
-<path clip-path="url(#clip3202)" d="
+<path clip-path="url(#clip7302)" d="
 M1834.81 1386.61 L1834.81 1386.61 L2235.22 1386.61 L2235.22 1386.61 L1834.81 1386.61 L1834.81 1386.61  Z
   " fill="#009af9" fill-rule="evenodd" fill-opacity="1"/>
-<polyline clip-path="url(#clip3202)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+<polyline clip-path="url(#clip7302)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
   1834.81,1386.61 1834.81,1386.61 2235.22,1386.61 2235.22,1386.61 1834.81,1386.61 
   "/>
 </svg>
@@ -402,150 +402,144 @@ julia&gt; ρBs = iid_copies(BB84_states(), 2)
  [0.25+0.0im 0.25+0.0im 0.25+0.0im 0.25+0.0im; 0.25+0.0im 0.25+0.0im 0.25+0.0im 0.25+0.0im; 0.25+0.0im 0.25+0.0im 0.25+0.0im 0.25+0.0im; 0.25+0.0im 0.25+0.0im 0.25+0.0im 0.25+0.0im]</code></pre><p>In this case, there are <span>$16! = 20922789888000$</span> possible guessing orders, and hence <span>$16!$</span> variables in the primal formulation of the SDP, or <span>$16!+1$</span> constraints in the dual form of the SDP. In either case, we can&#39;t even fit them all into our computer&#39;s memory. Instead, we resort to bounds:</p><pre><code class="language-julia-repl">julia&gt; lb_output = guesswork_lower_bound(p, ρBs, solver = get_sdp_solver());
 
 julia&gt; lb_output.optval
-2.5000110390503116
+2.4999988321870794
 
 julia&gt; ub_output = guesswork_upper_bound(p, ρBs; max_time = 30, make_solver = get_sdp_solver);
 
 julia&gt; ub_output.optval
-3.7839830469038285</code></pre><h2 id="A-closer-look-at-guesswork_upper_bound-1"><a class="docs-heading-anchor" href="#A-closer-look-at-guesswork_upper_bound-1">A closer look at <code>guesswork_upper_bound</code></a><a class="docs-heading-anchor-permalink" href="#A-closer-look-at-guesswork_upper_bound-1" title="Permalink"></a></h2><p>We can understand <a href="../#GuessworkQuantumSideInfo.guesswork_upper_bound"><code>guesswork_upper_bound</code></a> better by setting <code>verbose=true</code>. The algorithm computes a sequence of upper bounds by relaxing the dual problem. First, it removes all constraints, and chooses the dual variable <span>$Y$</span> as the identity matrix. Then it uses a simulated annealing algorithm to heuristically minimize <span>$\lambda_\text{min}(R_{\vec g} - Y)$</span> over the possible guessing orders <span>$\vec g$</span> (which are permutations), to find a constraint that is &quot;maximally&quot; violated by this choice of <span>$Y$</span>. Then we add the corresponding constraint <span>$Y \leq R_{\vec g}$</span> to the dual problem and solve it again. This is repeated until either a fixed number of constraints is added, some number of simulated annealing runs fails to find another violated constraint, or a time limit is reached. In the following, we set a time limit of 30 seconds.</p><pre><code class="language-julia-repl">julia&gt; ub_output = guesswork_upper_bound(p, ρBs; verbose=true, max_time = 30, make_solver = get_sdp_solver);
+3.778921628552863</code></pre><h2 id="A-closer-look-at-guesswork_upper_bound-1"><a class="docs-heading-anchor" href="#A-closer-look-at-guesswork_upper_bound-1">A closer look at <code>guesswork_upper_bound</code></a><a class="docs-heading-anchor-permalink" href="#A-closer-look-at-guesswork_upper_bound-1" title="Permalink"></a></h2><p>We can understand <a href="../#GuessworkQuantumSideInfo.guesswork_upper_bound"><code>guesswork_upper_bound</code></a> better by setting <code>verbose=true</code>. The algorithm computes a sequence of upper bounds by relaxing the dual problem. First, it removes all constraints, and chooses the dual variable <span>$Y$</span> as the identity matrix. Then it uses a simulated annealing algorithm to heuristically minimize <span>$\lambda_\text{min}(R_{\vec g} - Y)$</span> over the possible guessing orders <span>$\vec g$</span> (which are permutations), to find a constraint that is &quot;maximally&quot; violated by this choice of <span>$Y$</span>. Then we add the corresponding constraint <span>$Y \leq R_{\vec g}$</span> to the dual problem and solve it again. This is repeated until either a fixed number of constraints is added, some number of simulated annealing runs fails to find another violated constraint, or a time limit is reached. In the following, we set a time limit of 30 seconds.</p><pre><code class="language-julia-repl">julia&gt; ub_output = guesswork_upper_bound(p, ρBs; verbose=true, max_time = 30, make_solver = get_sdp_solver);
 ┌ Info: Adding constraint 1 
-│   violation = -15.052850964549668
-│   upper_bound = 8.500017174384023
-│   SA_time = 0.82936265
-│   solve_time = 0.001522965
-└   total_time_so_far = 0.82936265
+│   violation = -15.022701469714738
+│   upper_bound = 8.499999998653413
+│   SA_time = 0.865034005
+│   solve_time = 0.002619318
+└   total_time_so_far = 0.865034005
 ┌ Info: Adding constraint 2 
-│   violation = -2.1266023959764024
-│   upper_bound = 6.331815176750543
-│   SA_time = 0.876011096
-│   solve_time = 0.013482174
-└   total_time_so_far = 1.705373746
+│   violation = -1.7971432912989709
+│   upper_bound = 6.447676256207556
+│   SA_time = 0.867827711
+│   solve_time = 0.008435356
+└   total_time_so_far = 1.732861716
 ┌ Info: Adding constraint 3 
-│   violation = -1.2857923809138583
-│   upper_bound = 5.058793763256687
-│   SA_time = 0.946670862
-│   solve_time = 0.007567922
-└   total_time_so_far = 2.6520446079999997
+│   violation = -1.517272422923736
+│   upper_bound = 4.934009296513393
+│   SA_time = 0.865833688
+│   solve_time = 0.005432236
+└   total_time_so_far = 2.598695404
 ┌ Info: Adding constraint 4 
-│   violation = -1.2444846924144148
-│   upper_bound = 3.8161746155252283
-│   SA_time = 0.904052909
-│   solve_time = 0.009302195
-└   total_time_so_far = 3.5560975169999995
+│   violation = -1.0400168938481367
+│   upper_bound = 3.895021879247295
+│   SA_time = 0.8543137
+│   solve_time = 0.008922259
+└   total_time_so_far = 3.453009104
 ┌ Info: Adding constraint 5 
-│   violation = -0.0717672041377769
-│   upper_bound = 3.809529994183149
-│   SA_time = 0.902749614
-│   solve_time = 0.010998667
-└   total_time_so_far = 4.458847131
+│   violation = -0.14838260273994677
+│   upper_bound = 3.8619155426817913
+│   SA_time = 0.874496423
+│   solve_time = 0.007388949
+└   total_time_so_far = 4.327505527
 ┌ Info: Adding constraint 6 
-│   violation = -0.03307636048423983
-│   upper_bound = 3.8083606400775323
-│   SA_time = 0.894225814
-│   solve_time = 0.007288309
-└   total_time_so_far = 5.353072945
+│   violation = -0.064951045807712
+│   upper_bound = 3.856425083855312
+│   SA_time = 0.866070857
+│   solve_time = 0.011066773
+└   total_time_so_far = 5.193576384
 ┌ Info: Adding constraint 7 
-│   violation = -0.006101636502614654
-│   upper_bound = 3.8080834043713447
-│   SA_time = 0.880544498
-│   solve_time = 0.012577833
-└   total_time_so_far = 6.233617443
+│   violation = -0.06532100277268882
+│   upper_bound = 3.851078133812292
+│   SA_time = 0.841268082
+│   solve_time = 0.013165787
+└   total_time_so_far = 6.034844466
 ┌ Info: Adding constraint 8 
-│   violation = -0.024924178093971877
-│   upper_bound = 3.800163032241108
-│   SA_time = 0.87339906
-│   solve_time = 0.018479081
-└   total_time_so_far = 7.107016503
+│   violation = -0.03403056580717525
+│   upper_bound = 3.8267040403081545
+│   SA_time = 0.873502987
+│   solve_time = 0.014674897
+└   total_time_so_far = 6.908347453
 ┌ Info: Adding constraint 9 
-│   violation = -0.04988556417258004
-│   upper_bound = 3.792630843011642
-│   SA_time = 0.897048224
-│   solve_time = 0.017185126
-└   total_time_so_far = 8.004064727
+│   violation = -0.013115232333548062
+│   upper_bound = 3.8264607504940362
+│   SA_time = 0.867143734
+│   solve_time = 0.023303954
+└   total_time_so_far = 7.775491187
 ┌ Info: Adding constraint 10 
-│   violation = -0.012534836455223707
-│   upper_bound = 3.7923186337195838
-│   SA_time = 0.902737928
-│   solve_time = 0.020133549
-└   total_time_so_far = 8.906802655
+│   violation = -0.033910050110706046
+│   upper_bound = 3.824714695592715
+│   SA_time = 0.849683709
+│   solve_time = 0.018029718
+└   total_time_so_far = 8.625174896
 ┌ Info: Adding constraint 11 
-│   violation = -0.005591910474684009
-│   upper_bound = 3.7914535230212643
-│   SA_time = 0.892228845
-│   solve_time = 0.025392572
-└   total_time_so_far = 9.7990315
+│   violation = -0.03406439802636754
+│   upper_bound = 3.8035008600794313
+│   SA_time = 0.876872478
+│   solve_time = 0.024020358
+└   total_time_so_far = 9.502047374
 ┌ Info: Adding constraint 12 
-│   violation = -0.015843804616303137
-│   upper_bound = 3.7909262969718496
-│   SA_time = 0.911657328
-│   solve_time = 0.032094352
-└   total_time_so_far = 10.710688828
+│   violation = -0.03819307341633624
+│   upper_bound = 3.797713415123777
+│   SA_time = 0.865860096
+│   solve_time = 0.03505863
+└   total_time_so_far = 10.36790747
 ┌ Info: Adding constraint 13 
-│   violation = -0.0033699544719813877
-│   upper_bound = 3.7896396373510886
-│   SA_time = 0.903736958
-│   solve_time = 0.035120179
-└   total_time_so_far = 11.614425786
+│   violation = -0.008876305972135411
+│   upper_bound = 3.79022729195044
+│   SA_time = 1.714696347
+│   solve_time = 0.037099543
+└   total_time_so_far = 12.082603817
 ┌ Info: Adding constraint 14 
-│   violation = -0.006861865524095313
-│   upper_bound = 3.788849016735215
-│   SA_time = 1.790239687
-│   solve_time = 0.053205035
-└   total_time_so_far = 13.404665473
+│   violation = -0.005095422720885886
+│   upper_bound = 3.790130277549879
+│   SA_time = 0.863249248
+│   solve_time = 0.135513286
+└   total_time_so_far = 12.945853065000001
 ┌ Info: Adding constraint 15 
-│   violation = -0.005365268441231178
-│   upper_bound = 3.7848909655618552
-│   SA_time = 3.654917196
-│   solve_time = 0.064610005
-└   total_time_so_far = 17.059582669
+│   violation = -0.0035232882075129273
+│   upper_bound = 3.7873331040441256
+│   SA_time = 1.737786038
+│   solve_time = 0.074567885
+└   total_time_so_far = 14.683639103
 ┌ Info: Adding constraint 16 
-│   violation = -0.005076006634920874
-│   upper_bound = 3.7845089707669226
-│   SA_time = 1.779920554
-│   solve_time = 0.078109638
-└   total_time_so_far = 18.839503223
+│   violation = -0.009819449022783241
+│   upper_bound = 3.784548540351249
+│   SA_time = 1.596309681
+│   solve_time = 0.067208336
+└   total_time_so_far = 16.279948784000002
 ┌ Info: Adding constraint 17 
-│   violation = -0.0007998700055871345
-│   upper_bound = 3.784440838289406
-│   SA_time = 1.820269268
-│   solve_time = 0.104581089
-└   total_time_so_far = 20.659772491000002
+│   violation = -0.007247589816252622
+│   upper_bound = 3.7837150269032085
+│   SA_time = 0.748351456
+│   solve_time = 0.090831288
+└   total_time_so_far = 17.02830024
 ┌ Info: Adding constraint 18 
-│   violation = -0.006844104236740414
-│   upper_bound = 3.7825434336066515
-│   SA_time = 0.888836773
-│   solve_time = 0.132287743
-└   total_time_so_far = 21.548609264000003
+│   violation = -0.0008083761579229068
+│   upper_bound = 3.78318055024411
+│   SA_time = 3.865482764
+│   solve_time = 0.120626076
+└   total_time_so_far = 20.893783004
 ┌ Info: Adding constraint 19 
-│   violation = -0.00018185641802248353
-│   upper_bound = 3.7824752701356323
-│   SA_time = 0.919556238
-│   solve_time = 0.191175986
-└   total_time_so_far = 22.468165502
+│   violation = -0.008234380754494978
+│   upper_bound = 3.7822561914569697
+│   SA_time = 1.525880302
+│   solve_time = 0.295224694
+└   total_time_so_far = 22.419663306
 ┌ Info: Adding constraint 20 
-│   violation = -0.003532927161535391
-│   upper_bound = 3.7819816982196426
-│   SA_time = 0.904774573
-│   solve_time = 0.236235499
-└   total_time_so_far = 23.372940075000002
+│   violation = -0.0015231124960010719
+│   upper_bound = 3.781897466510621
+│   SA_time = 2.251236105
+│   solve_time = 0.088645466
+└   total_time_so_far = 24.670899411
 ┌ Info: Adding constraint 21 
-│   violation = -0.004775281050194717
-│   upper_bound = 3.7808315087841016
-│   SA_time = 2.637546579
-│   solve_time = 0.211410561
-└   total_time_so_far = 26.010486654
+│   violation = -0.004386077068910315
+│   upper_bound = 3.7796115916813666
+│   SA_time = 2.255031968
+│   solve_time = 0.106850779
+└   total_time_so_far = 26.925931379
 ┌ Info: Adding constraint 22 
-│   violation = -0.0054081612864941165
-│   upper_bound = 3.7795776620717394
-│   SA_time = 0.909919533
-│   solve_time = 0.179176239
-└   total_time_so_far = 26.920406187
-┌ Info: Adding constraint 23 
-│   violation = -0.0032094352603489118
-│   upper_bound = 3.778316010706618
-│   SA_time = 1.762652119
-│   solve_time = 0.157302346
-└   total_time_so_far = 28.683058306
+│   violation = -0.0007386046738279665
+│   upper_bound = 3.7791333002080596
+│   SA_time = 1.470644638
+│   solve_time = 0.134530652
+└   total_time_so_far = 28.396576017
 ┌ Info: Next iteration is projected to exceed maximum time 30; terminating here. Change `max_time` to adjust this behavior.
-│   total_time_so_far = 28.683058306
-└   projected_time = 30.795008217499998</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Home</a><a class="docs-footer-nextpage" href="../high-precision-example/">High precision example »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Tuesday 1 September 2020 10:23">Tuesday 1 September 2020</span>. Using Julia version 1.0.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+│   total_time_so_far = 28.396576017
+└   projected_time = 30.162268836000003</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Home</a><a class="docs-footer-nextpage" href="../high-precision-example/">High precision example »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Monday 7 September 2020 20:56">Monday 7 September 2020</span>. Using Julia version 1.0.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
