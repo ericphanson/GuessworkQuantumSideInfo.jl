@@ -39,7 +39,7 @@ with several choices of parameters and underlying solvers. The
 mixed-integer SDP formulation was evaluated with *M* = *d*<sub>*B*</sub>
 (yielding an upper bound), *M* = *d*<sub>*B*</sub><sup>2</sup>
 (yielding the optimal value), with the Pajarito mixed-integer SDP
-solver , using Convex.jl (version 0.12.7) to formulate the problem.
+solver [2], using Convex.jl (version 0.12.7) [6] to formulate the problem.
 Pajarito proceeds by solving mixed-integer linear problems (MILP) and
 SDPs as subproblems, and thus uses both a MILP solver and an SDP solver
 as subcomponents. Pajarito provides two algorithms: an iterative
@@ -59,20 +59,21 @@ Gurobi as the MILP solver and MOSEK as the SDP solver, with Pajarito’s
 iterative algorithm, with a relative optimality gap tolerance of 0,
 
 * \(o\)
-Cbc (version 2.10.3) as the MILP solver, and SCS (version 2.1.1) as the
+Cbc (version 2.10.3) [4] as the MILP solver, and SCS (version 2.1.1) [5] as the
 SDP solver, with Pajarito’s iterative algorithm
 
-Here, ‘c’ stands for commercial, and ‘o‘ for open-source. In
-configuration c1, Gurobi was set to have with a relative optimality gap
-tolerance of 10<sup> − 5</sup> and in c2, a relative optimality gap
-tolerance of 0. In both configurations, Gurobi was given an absolute
+Here, ‘c’ stands for commercial, and ‘o’ for open-source. In the
+configuration (c1), Gurobi was set to have with a relative optimality
+gap tolerance of 10<sup> − 5</sup> and in (c2), a relative optimality
+gap tolerance of 0. In both configurations, Gurobi was given an absolute
 linear-constraint-wise feasibility tolerance of 10<sup> − 8</sup>, and
 an integrality tolerance of 10<sup> − 9</sup>. These choices of
-parameters match those made in . Cbc was given an integrality tolerance
+parameters match those made in [2]. Cbc was given an integrality tolerance
 of 10<sup> − 8</sup>, and SCS’s (normalized) primal, dual residual and
 relative gap were set to 10<sup> − 6</sup> for each problem. The default
 parameters were used otherwise. Note the MSD option was not used with
 Cbc, since the solver does not support lazy callbacks.
+
 
 For the (exponentially large) SDP primal and dual formulations, the
 problems were solved with both MOSEK and SCS, and likewise with the
@@ -94,7 +95,7 @@ The exact answer was not known analytically for most of these problems,
 so the average relative error was calculated by comparing to the mean of
 the solutions (excluding the active-set method and the MISDP with
 *M* = *d*<sub>*B*</sub>, which only give an upper bound in general). In
-the BB84 case, in which the solution is known exactly (see ), the
+the BB84 case, in which the solution is known exactly (see [3]), the
 solutions obtained here match the analytic value to a relative tolerance
 of at least 10<sup> − 7</sup>.
 
@@ -102,6 +103,22 @@ The problems were run sequentially on a 4-core desktop computer (Intel
 i7-6700K 4.00GHz CPU, with 16 GB of RAM, on Ubuntu-20.04 via Windows
 Subsystem for Linux, version 2), via the programming language Julia
 (version 1.5.1), with a 5 minute time limit.
+
+One can see that the MISDP problems were harder solve than the
+corresponding SDPs for these relatively small problem instances. The
+MISDPs have the advantage of finding extremal solutions, however, in the
+case *M* = *d*<sub>*B*</sub>, and may scale better to large instances.
+Additionally, the active-set upper bound performed fairly well, finding
+feasible points within 20 % of the optimum in all cases, with only
+*t*<sub>max</sub> = 20 s, and often finding near-optimal solutions. It
+was also the only method able to scale to the largest instances tested,
+such as two copies of the BB84 states (which involves 16 quantum states
+in dimension 4, and which the SDP formulation has 16! variables.). In
+general, the commercial solvers performed better than the open source
+solvers, with the notable exception of the active-set upper bound with
+MOSEK, in which 2 more problems timed out than with SCS. This could be
+due to SCS being a first-order solver which can therefore possibly scale
+to larger problem instances than MOSEK, which is a second-order solver.
 
 
 | Algorithm                             | Parameters                | average rel. error | average time | number solved | number timed out | number errored out |
@@ -200,3 +217,11 @@ of memory).
 
 [1] The maximum time can still be exceeded, since at least one iteration
 must be performed and the estimate can be wrong.
+
+# References
+
+* [2] Coey, Chris, Miles Lubin, and Juan Pablo Vielma. 2018. “Outer Approximation With Conic Certificates For Mixed-Integer Convex Problems.” ArXiv:1808.05290 [Math], August. http://arxiv.org/abs/1808.05290.
+* [3] Hanson, Eric P., Vishal Katariya, Nilanjana Datta, and Mark M. Wilde. 2020. “Guesswork with Quantum Side Information.” ArXiv:2001.03598 [Quant-Ph], February. http://arxiv.org/abs/2001.03598.
+* [4] johnjforrest, Stefan Vigerske, Ted Ralphs, Haroldo Gambini Santos, Lou Hafer, Bjarni Kristjansson, jpfasano, et al. 2019. Coin-or/Cbc: Version 2.10.3. Zenodo. https://doi.org/10.5281/zenodo.3246628.
+* [5] O’Donoghue, B., E. Chu, N. Parikh, and S. Boyd. 2016. “Conic Optimization via Operator Splitting and Homogeneous Self-Dual Embedding.” Journal of Optimization Theory and Applications 169 (3): 1042–68.
+* [6] Udell, Madeleine, Karanveer Mohan, David Zeng, Jenny Hong, Steven Diamond, and Stephen Boyd. 2014. “Convex Optimization in Julia.” In Proceedings of the 1st First Workshop for High Performance Technical Computing in Dynamic Languages, 18–28.
