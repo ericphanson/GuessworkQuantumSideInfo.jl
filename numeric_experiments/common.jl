@@ -69,6 +69,9 @@ for (misdp_solver, settings) in [(PajaritoSolver(cont_solver=MosekSolver(LOG=0),
                      mip_solver_drives=false, rel_gap = 1e-5,
                      log_level=0), "Pajarito(SCS, Cbc, MSD=false)")]
     push!(algos,
+        (; f = (prob -> @timed guesswork_MISDP(prob.p, prob.ρBs, size(first(prob.ρBs),1); solver=misdp_solver, verbose=false).optval), algo = "MISDP_dB",
+                                                                                                                              settings))
+    push!(algos,
           (; f = (prob -> @timed guesswork_MISDP(prob.p, prob.ρBs; solver=misdp_solver, verbose=false).optval), algo = "MISDP",
                                                                                                                    settings))
 end

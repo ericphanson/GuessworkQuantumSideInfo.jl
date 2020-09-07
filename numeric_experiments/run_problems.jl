@@ -48,7 +48,13 @@ function run_problem(algo_idx, problem_idx; verbose = true)
             warnings = true
         end
         verbose && @info results
-        optval, elapsed = parse.(Float64, results[end-1:end])
+        if length(results) < 2
+            verbose && @error "Not enough returns, something went wrong"
+            errors = true
+            optval, elapsed = NaN, NaN
+        else
+            optval, elapsed = parse.(Float64, results[end-1:end])
+        end
         f = () -> write_results(algo, prob, optval, elapsed; errors = !isempty(errors_text), warnings)
     end
     return f
@@ -58,6 +64,7 @@ n_problems = length(problems)
 n_algos = length(algos)
 timeout = 60*5
 for problem_idx in 1:n_problems, algo_idx in 1:n_algos
+    algos[algo_idx].algo == "MISDP_dB" || continue
     f = run_problem(algo_idx, problem_idx; verbose = true)
     f()
 end
