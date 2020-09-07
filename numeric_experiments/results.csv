@@ -1,0 +1,229 @@
+algo,settings,numeric_type,problem,optval,elapsed_seconds,warnings,errors
+MISDP,"Pajarito(Mosek, Gurobi, MSD=false)",Float64,2qubits(1),1.254935008191061,22.8479812,false,false
+MISDP,"Pajarito(Mosek, Gurobi, MSD=true)",Float64,2qubits(1),1.254934996180558,23.3493885,false,false
+MISDP,"Pajarito(SCS, Cbc, MSD=false)",Float64,2qubits(1),1.2549349930201852,24.7053996,false,false
+SDP,Mosek,Float64,2qubits(1),1.254935008096305,8.6902007,false,false
+dual_SDP,Mosek,Float64,2qubits(1),1.254934989188837,8.458288,false,false
+guesswork_upper_bound(max_time=20),Mosek,Float64,2qubits(1),1.4999999999980487,8.7578906,false,false
+guesswork_upper_bound(max_time=60),Mosek,Float64,2qubits(1),1.4999999999980487,10.9102688,false,false
+guesswork_upper_bound(max_time=240),Mosek,Float64,2qubits(1),1.4999999999980487,9.4719107,false,false
+SDP,SCS,Float64,2qubits(1),1.254934948577658,9.0020535,false,false
+dual_SDP,SCS,Float64,2qubits(1),1.2549349952019324,8.7551425,false,false
+guesswork_upper_bound(max_time=20),SCS,Float64,2qubits(1),1.499999999879668,9.0447568,false,false
+guesswork_upper_bound(max_time=60),SCS,Float64,2qubits(1),1.499999999879668,9.0737937,false,false
+guesswork_upper_bound(max_time=240),SCS,Float64,2qubits(1),1.499999999879668,9.0386222,false,false
+MISDP,"Pajarito(Mosek, Gurobi, MSD=false)",Float64,3qubits(1),1.5315835908607798,33.7600876,false,false
+MISDP,"Pajarito(Mosek, Gurobi, MSD=true)",Float64,3qubits(1),1.5315835696345121,27.0816645,false,false
+MISDP,"Pajarito(SCS, Cbc, MSD=false)",Float64,3qubits(1),NaN,NaN,false,false
+SDP,Mosek,Float64,3qubits(1),1.5315835982285744,9.3482174,false,false
+dual_SDP,Mosek,Float64,3qubits(1),1.5315835639649773,9.1440335,false,false
+guesswork_upper_bound(max_time=20),Mosek,Float64,3qubits(1),1.55143345179782,9.7268027,false,false
+guesswork_upper_bound(max_time=60),Mosek,Float64,3qubits(1),1.55143345179782,9.6872898,false,false
+guesswork_upper_bound(max_time=240),Mosek,Float64,3qubits(1),1.55143345179782,9.6855354,false,false
+SDP,SCS,Float64,3qubits(1),1.5315836482762242,9.0878709,false,false
+dual_SDP,SCS,Float64,3qubits(1),1.5315835761159902,8.8595117,false,false
+guesswork_upper_bound(max_time=20),SCS,Float64,3qubits(1),1.5514335194601956,9.4359064,false,false
+guesswork_upper_bound(max_time=60),SCS,Float64,3qubits(1),1.5514335194601956,9.4387474,false,false
+guesswork_upper_bound(max_time=240),SCS,Float64,3qubits(1),1.5514335194601956,8.8855632,false,false
+MISDP,"Pajarito(Mosek, Gurobi, MSD=false)",Float64,Y(1),1.422649790197531,32.9258842,true,false
+MISDP,"Pajarito(Mosek, Gurobi, MSD=true)",Float64,Y(1),1.4226497382896444,27.6751057,true,false
+MISDP,"Pajarito(SCS, Cbc, MSD=false)",Float64,Y(1),NaN,NaN,false,false
+SDP,Mosek,Float64,Y(1),1.422649741094202,9.326394,false,false
+dual_SDP,Mosek,Float64,Y(1),1.4226497338611328,9.1115323,false,false
+guesswork_upper_bound(max_time=20),Mosek,Float64,Y(1),1.422649730078765,9.7188591,false,false
+guesswork_upper_bound(max_time=60),Mosek,Float64,Y(1),1.4226497077704807,9.6625051,false,false
+guesswork_upper_bound(max_time=240),Mosek,Float64,Y(1),1.4226497301069139,9.8102977,false,false
+SDP,SCS,Float64,Y(1),1.4226494912208716,8.976787,false,false
+dual_SDP,SCS,Float64,Y(1),1.422649730963161,8.741583,false,false
+guesswork_upper_bound(max_time=20),SCS,Float64,Y(1),1.4226497307011863,9.2282523,false,false
+guesswork_upper_bound(max_time=60),SCS,Float64,Y(1),1.4226497307011854,9.1781923,false,false
+guesswork_upper_bound(max_time=240),SCS,Float64,Y(1),1.4226497307011863,9.3057953,false,false
+MISDP,"Pajarito(Mosek, Gurobi, MSD=false)",Float64,BB84(1),NaN,NaN,false,false
+MISDP,"Pajarito(Mosek, Gurobi, MSD=true)",Float64,BB84(1),NaN,NaN,false,false
+MISDP,"Pajarito(SCS, Cbc, MSD=false)",Float64,BB84(1),NaN,NaN,false,false
+SDP,Mosek,Float64,BB84(1),1.709430585203046,8.8681798,false,false
+dual_SDP,Mosek,Float64,BB84(1),1.70943058402584,8.6237742,false,false
+guesswork_upper_bound(max_time=20),Mosek,Float64,BB84(1),1.7094305753904342,9.5134354,false,false
+guesswork_upper_bound(max_time=60),Mosek,Float64,BB84(1),1.7094305810180206,9.7677162,false,false
+guesswork_upper_bound(max_time=240),Mosek,Float64,BB84(1),1.7094305248798227,9.4909807,false,false
+SDP,SCS,Float64,BB84(1),1.7094306214229236,8.5401641,false,false
+dual_SDP,SCS,Float64,BB84(1),1.7094305848837652,8.2306411,false,false
+guesswork_upper_bound(max_time=20),SCS,Float64,BB84(1),1.7094305682408302,9.0949739,false,false
+guesswork_upper_bound(max_time=60),SCS,Float64,BB84(1),1.7094305843004052,9.2856356,false,false
+guesswork_upper_bound(max_time=240),SCS,Float64,BB84(1),1.7094305682408737,9.1506415,false,false
+MISDP,"Pajarito(Mosek, Gurobi, MSD=false)",Float64,2qutrits(1),1.255145077130398,30.3665841,false,false
+MISDP,"Pajarito(Mosek, Gurobi, MSD=true)",Float64,2qutrits(1),1.255145070937713,33.8677304,false,false
+MISDP,"Pajarito(SCS, Cbc, MSD=false)",Float64,2qutrits(1),NaN,NaN,false,false
+SDP,Mosek,Float64,2qutrits(1),1.2551449846482652,8.7806062,false,false
+dual_SDP,Mosek,Float64,2qutrits(1),1.255144970810816,8.5387358,false,false
+guesswork_upper_bound(max_time=20),Mosek,Float64,2qutrits(1),1.4999999995692301,8.8869137,false,false
+guesswork_upper_bound(max_time=60),Mosek,Float64,2qutrits(1),1.4999999995692301,8.8707072,false,false
+guesswork_upper_bound(max_time=240),Mosek,Float64,2qutrits(1),1.4999999995692301,8.9047032,false,false
+SDP,SCS,Float64,2qutrits(1),1.2551450482354998,8.4399617,false,false
+dual_SDP,SCS,Float64,2qutrits(1),1.2551449788825657,8.3335215,false,false
+guesswork_upper_bound(max_time=20),SCS,Float64,2qutrits(1),1.499999997301028,8.699171,false,false
+guesswork_upper_bound(max_time=60),SCS,Float64,2qutrits(1),1.499999997301028,8.6579571,false,false
+guesswork_upper_bound(max_time=240),SCS,Float64,2qutrits(1),1.499999997301028,8.7902263,false,false
+MISDP,"Pajarito(Mosek, Gurobi, MSD=false)",Float64,3qutrits(1),NaN,NaN,false,false
+MISDP,"Pajarito(Mosek, Gurobi, MSD=true)",Float64,3qutrits(1),NaN,NaN,false,false
+MISDP,"Pajarito(SCS, Cbc, MSD=false)",Float64,3qutrits(1),NaN,NaN,false,false
+SDP,Mosek,Float64,3qutrits(1),1.471036475781681,8.8248976,false,false
+dual_SDP,Mosek,Float64,3qutrits(1),1.4710363761428709,8.5505169,false,false
+guesswork_upper_bound(max_time=20),Mosek,Float64,3qutrits(1),1.5562851836654978,9.5011555,false,false
+guesswork_upper_bound(max_time=60),Mosek,Float64,3qutrits(1),1.5562851836654978,9.4520119,false,false
+guesswork_upper_bound(max_time=240),Mosek,Float64,3qutrits(1),1.5562851836654978,9.4534974,false,false
+SDP,SCS,Float64,3qutrits(1),1.4710366265761445,8.4558049,false,false
+dual_SDP,SCS,Float64,3qutrits(1),1.4710362238910173,8.2458754,false,false
+guesswork_upper_bound(max_time=20),SCS,Float64,3qutrits(1),1.5562846392846454,9.6662718,false,false
+guesswork_upper_bound(max_time=60),SCS,Float64,3qutrits(1),1.5562846392846454,9.107038,false,false
+guesswork_upper_bound(max_time=240),SCS,Float64,3qutrits(1),1.5562846392846454,9.0146762,false,false
+MISDP,"Pajarito(Mosek, Gurobi, MSD=false)",Float64,2qubits(2),NaN,NaN,false,false
+MISDP,"Pajarito(Mosek, Gurobi, MSD=true)",Float64,2qubits(2),NaN,NaN,false,false
+MISDP,"Pajarito(SCS, Cbc, MSD=false)",Float64,2qubits(2),NaN,NaN,false,false
+SDP,Mosek,Float64,2qubits(2),1.7503204060173534,8.8412297,false,false
+dual_SDP,Mosek,Float64,2qubits(2),1.750320341208066,8.6292731,false,false
+guesswork_upper_bound(max_time=20),Mosek,Float64,2qubits(2),1.7763899365151006,10.4054094,false,false
+guesswork_upper_bound(max_time=60),Mosek,Float64,2qubits(2),1.7745147449590317,10.4099024,false,false
+guesswork_upper_bound(max_time=240),Mosek,Float64,2qubits(2),1.7763899365182758,10.4019568,false,false
+SDP,SCS,Float64,2qubits(2),1.7503204685792013,8.8986134,false,false
+dual_SDP,SCS,Float64,2qubits(2),1.7503217558950943,8.3211818,false,false
+guesswork_upper_bound(max_time=20),SCS,Float64,2qubits(2),1.7763899165999122,10.916788,false,false
+guesswork_upper_bound(max_time=60),SCS,Float64,2qubits(2),1.7745140186833968,10.2178801,false,false
+guesswork_upper_bound(max_time=240),SCS,Float64,2qubits(2),1.7744435625346329,10.0230561,false,false
+MISDP,"Pajarito(Mosek, Gurobi, MSD=false)",Float64,3qubits(2),NaN,NaN,false,false
+MISDP,"Pajarito(Mosek, Gurobi, MSD=true)",Float64,3qubits(2),NaN,NaN,false,false
+MISDP,"Pajarito(SCS, Cbc, MSD=false)",Float64,3qubits(2),NaN,NaN,false,false
+SDP,Mosek,Float64,3qubits(2),NaN,NaN,false,false
+dual_SDP,Mosek,Float64,3qubits(2),NaN,NaN,false,false
+guesswork_upper_bound(max_time=20),Mosek,Float64,3qubits(2),2.7672182086517387,32.2916971,false,false
+guesswork_upper_bound(max_time=60),Mosek,Float64,3qubits(2),2.7676240967276766,24.1154537,false,false
+guesswork_upper_bound(max_time=240),Mosek,Float64,3qubits(2),2.7676240668569907,30.4157592,false,false
+SDP,SCS,Float64,3qubits(2),NaN,NaN,false,false
+dual_SDP,SCS,Float64,3qubits(2),NaN,NaN,false,false
+guesswork_upper_bound(max_time=20),SCS,Float64,3qubits(2),2.7672184622684357,35.6556466,false,false
+guesswork_upper_bound(max_time=60),SCS,Float64,3qubits(2),2.7672181040034545,54.6013249,false,false
+guesswork_upper_bound(max_time=240),SCS,Float64,3qubits(2),2.7672047842754983,75.4263761,false,false
+MISDP,"Pajarito(Mosek, Gurobi, MSD=false)",Float64,Y(2),NaN,NaN,false,false
+MISDP,"Pajarito(Mosek, Gurobi, MSD=true)",Float64,Y(2),NaN,NaN,false,false
+MISDP,"Pajarito(SCS, Cbc, MSD=false)",Float64,Y(2),NaN,NaN,false,false
+SDP,Mosek,Float64,Y(2),NaN,NaN,false,false
+dual_SDP,Mosek,Float64,Y(2),NaN,NaN,false,false
+guesswork_upper_bound(max_time=20),Mosek,Float64,Y(2),2.320856634278685,34.2465309,false,false
+guesswork_upper_bound(max_time=60),Mosek,Float64,Y(2),2.320856772167582,30.996122,false,false
+guesswork_upper_bound(max_time=240),Mosek,Float64,Y(2),2.3208567801177336,30.2602784,false,false
+SDP,SCS,Float64,Y(2),NaN,NaN,false,false
+dual_SDP,SCS,Float64,Y(2),NaN,NaN,false,false
+guesswork_upper_bound(max_time=20),SCS,Float64,Y(2),2.320856591038295,82.8359903,false,false
+guesswork_upper_bound(max_time=60),SCS,Float64,Y(2),2.320856747573597,50.7868997,false,false
+guesswork_upper_bound(max_time=240),SCS,Float64,Y(2),2.3208566985412618,37.362088,false,false
+MISDP,"Pajarito(Mosek, Gurobi, MSD=false)",Float64,BB84(2),NaN,NaN,false,false
+MISDP,"Pajarito(Mosek, Gurobi, MSD=true)",Float64,BB84(2),NaN,NaN,false,false
+MISDP,"Pajarito(SCS, Cbc, MSD=false)",Float64,BB84(2),NaN,NaN,false,false
+SDP,Mosek,Float64,BB84(2),NaN,NaN,false,true
+dual_SDP,Mosek,Float64,BB84(2),NaN,NaN,false,true
+guesswork_upper_bound(max_time=20),Mosek,Float64,BB84(2),3.7811860979433263,27.7171467,false,false
+guesswork_upper_bound(max_time=60),Mosek,Float64,BB84(2),3.771192992150866,66.469113,false,false
+guesswork_upper_bound(max_time=240),Mosek,Float64,BB84(2),3.7682775167884057,133.8114008,false,false
+SDP,SCS,Float64,BB84(2),NaN,NaN,false,true
+dual_SDP,SCS,Float64,BB84(2),NaN,NaN,false,true
+guesswork_upper_bound(max_time=20),SCS,Float64,BB84(2),3.779617362857275,28.760714,false,false
+guesswork_upper_bound(max_time=60),SCS,Float64,BB84(2),3.7715124469415007,70.5699564,false,false
+guesswork_upper_bound(max_time=240),SCS,Float64,BB84(2),3.768213428570261,177.6444008,false,false
+MISDP,"Pajarito(Mosek, Gurobi, MSD=false)",Float64,2qutrits(2),NaN,NaN,false,false
+MISDP,"Pajarito(Mosek, Gurobi, MSD=true)",Float64,2qutrits(2),NaN,NaN,false,false
+MISDP,"Pajarito(SCS, Cbc, MSD=false)",Float64,2qutrits(2),NaN,NaN,false,false
+SDP,Mosek,Float64,2qutrits(2),1.7368579207940624,9.2295285,false,false
+dual_SDP,Mosek,Float64,2qutrits(2),1.7368579132221822,8.8348357,false,false
+guesswork_upper_bound(max_time=20),Mosek,Float64,2qutrits(2),NaN,NaN,false,false
+guesswork_upper_bound(max_time=60),Mosek,Float64,2qutrits(2),NaN,NaN,false,false
+guesswork_upper_bound(max_time=240),Mosek,Float64,2qutrits(2),NaN,NaN,false,false
+SDP,SCS,Float64,2qutrits(2),1.7368580657916646,11.2161223,false,false
+dual_SDP,SCS,Float64,2qutrits(2),1.7368575755119444,9.1961901,false,false
+guesswork_upper_bound(max_time=20),SCS,Float64,2qutrits(2),1.7554742953569498,101.0598171,false,false
+guesswork_upper_bound(max_time=60),SCS,Float64,2qutrits(2),1.7578147992900353,32.9359894,false,false
+guesswork_upper_bound(max_time=240),SCS,Float64,2qutrits(2),1.7583289930168684,22.6860797,false,false
+MISDP,"Pajarito(Mosek, Gurobi, MSD=false)",Float64,3qutrits(2),NaN,NaN,false,false
+MISDP,"Pajarito(Mosek, Gurobi, MSD=true)",Float64,3qutrits(2),NaN,NaN,false,false
+MISDP,"Pajarito(SCS, Cbc, MSD=false)",Float64,3qutrits(2),NaN,NaN,false,false
+SDP,Mosek,Float64,3qutrits(2),NaN,NaN,false,false
+dual_SDP,Mosek,Float64,3qutrits(2),NaN,NaN,false,false
+guesswork_upper_bound(max_time=20),Mosek,Float64,3qutrits(2),NaN,NaN,false,false
+guesswork_upper_bound(max_time=60),Mosek,Float64,3qutrits(2),NaN,NaN,false,false
+guesswork_upper_bound(max_time=240),Mosek,Float64,3qutrits(2),NaN,NaN,false,false
+SDP,SCS,Float64,3qutrits(2),NaN,NaN,false,false
+dual_SDP,SCS,Float64,3qutrits(2),NaN,NaN,false,false
+guesswork_upper_bound(max_time=20),SCS,Float64,3qutrits(2),2.6455718400755233,84.4330259,false,false
+guesswork_upper_bound(max_time=60),SCS,Float64,3qutrits(2),2.639131319680283,155.5140639,false,false
+guesswork_upper_bound(max_time=240),SCS,Float64,3qutrits(2),NaN,NaN,false,false
+MISDP_dB,"Pajarito(Mosek, Gurobi, MSD=false)",Float64,2qubits(1),1.2549350503546497,22.9851179,false,false
+MISDP_dB,"Pajarito(Mosek, Gurobi, MSD=true)",Float64,2qubits(1),1.2549350503546497,23.6271632,false,false
+MISDP_dB,"Pajarito(SCS, Cbc, MSD=false)",Float64,2qubits(1),1.2549359025427322,23.4738548,false,false
+MISDP_dB,"Pajarito(Mosek, Gurobi, MSD=false)",Float64,3qubits(1),1.531583578752242,23.1706345,false,false
+MISDP_dB,"Pajarito(Mosek, Gurobi, MSD=true)",Float64,3qubits(1),1.5315835787522418,23.630824,false,false
+MISDP_dB,"Pajarito(SCS, Cbc, MSD=false)",Float64,3qubits(1),1.5315876003496776,27.1068016,false,false
+MISDP_dB,"Pajarito(Mosek, Gurobi, MSD=false)",Float64,Y(1),1.4226497495723145,23.2142919,true,false
+MISDP_dB,"Pajarito(Mosek, Gurobi, MSD=true)",Float64,Y(1),1.4226497297957217,23.5631458,true,false
+MISDP_dB,"Pajarito(SCS, Cbc, MSD=false)",Float64,Y(1),1.422648765315336,26.1466155,false,true
+MISDP_dB,"Pajarito(Mosek, Gurobi, MSD=false)",Float64,BB84(1),1.7094305955725198,25.0106493,false,false
+MISDP_dB,"Pajarito(Mosek, Gurobi, MSD=true)",Float64,BB84(1),1.7094305955725198,23.5142924,false,false
+MISDP_dB,"Pajarito(SCS, Cbc, MSD=false)",Float64,BB84(1),1.7094293534710712,73.8001398,false,false
+MISDP_dB,"Pajarito(Mosek, Gurobi, MSD=false)",Float64,2qutrits(1),1.255145017108577,23.3100727,false,false
+MISDP_dB,"Pajarito(Mosek, Gurobi, MSD=true)",Float64,2qutrits(1),1.255145017108577,23.596305,false,false
+MISDP_dB,"Pajarito(SCS, Cbc, MSD=false)",Float64,2qutrits(1),1.2551468576010365,24.7745932,false,false
+MISDP_dB,"Pajarito(Mosek, Gurobi, MSD=false)",Float64,3qutrits(1),1.4710364763587662,26.4991661,false,false
+MISDP_dB,"Pajarito(Mosek, Gurobi, MSD=true)",Float64,3qutrits(1),1.4710364763587662,24.4914356,false,false
+MISDP_dB,"Pajarito(SCS, Cbc, MSD=false)",Float64,3qutrits(1),1.4710321441071241,95.0050658,false,true
+MISDP_dB,"Pajarito(Mosek, Gurobi, MSD=false)",Float64,2qubits(2),NaN,NaN,false,false
+MISDP_dB,"Pajarito(Mosek, Gurobi, MSD=true)",Float64,2qubits(2),NaN,NaN,false,false
+MISDP_dB,"Pajarito(SCS, Cbc, MSD=false)",Float64,2qubits(2),NaN,NaN,false,false
+MISDP_dB,"Pajarito(Mosek, Gurobi, MSD=false)",Float64,3qubits(2),NaN,NaN,false,false
+MISDP_dB,"Pajarito(Mosek, Gurobi, MSD=true)",Float64,3qubits(2),NaN,NaN,false,false
+MISDP_dB,"Pajarito(SCS, Cbc, MSD=false)",Float64,3qubits(2),NaN,NaN,false,false
+MISDP_dB,"Pajarito(Mosek, Gurobi, MSD=false)",Float64,Y(2),NaN,NaN,false,false
+MISDP_dB,"Pajarito(Mosek, Gurobi, MSD=true)",Float64,Y(2),NaN,NaN,false,false
+MISDP_dB,"Pajarito(SCS, Cbc, MSD=false)",Float64,Y(2),NaN,NaN,false,false
+MISDP_dB,"Pajarito(Mosek, Gurobi, MSD=false)",Float64,BB84(2),NaN,NaN,false,false
+MISDP_dB,"Pajarito(Mosek, Gurobi, MSD=true)",Float64,BB84(2),NaN,NaN,false,false
+MISDP_dB,"Pajarito(SCS, Cbc, MSD=false)",Float64,BB84(2),NaN,NaN,false,false
+MISDP_dB,"Pajarito(Mosek, Gurobi, MSD=false)",Float64,2qutrits(2),NaN,NaN,false,false
+MISDP_dB,"Pajarito(Mosek, Gurobi, MSD=true)",Float64,2qutrits(2),NaN,NaN,false,false
+MISDP_dB,"Pajarito(SCS, Cbc, MSD=false)",Float64,2qutrits(2),NaN,NaN,false,false
+MISDP_dB,"Pajarito(Mosek, Gurobi, MSD=false)",Float64,3qutrits(2),NaN,NaN,false,false
+MISDP_dB,"Pajarito(Mosek, Gurobi, MSD=true)",Float64,3qutrits(2),NaN,NaN,false,false
+MISDP_dB,"Pajarito(SCS, Cbc, MSD=false)",Float64,3qutrits(2),NaN,NaN,false,false
+MISDP (dB^2),"Pajarito(Mosek, Gurobi, MSD=false)",Float64,2qubits(1),1.2549350272184832,25.0180601,false,false
+MISDP (dB^2),"Pajarito(Mosek, Gurobi, MSD=true)",Float64,2qubits(1),1.2549349960643177,24.4915273,false,false
+MISDP (dB^2),"Pajarito(SCS, Cbc, MSD=false)",Float64,2qubits(1),1.2549344493592418,26.5418423,false,false
+MISDP (dB^2),"Pajarito(Mosek, Gurobi, MSD=false)",Float64,3qubits(1),1.5315837236968899,26.384784,false,false
+MISDP (dB^2),"Pajarito(Mosek, Gurobi, MSD=true)",Float64,3qubits(1),1.531583569528324,25.8218552,false,false
+MISDP (dB^2),"Pajarito(SCS, Cbc, MSD=false)",Float64,3qubits(1),1.5315809630022876,144.9346841,false,true
+MISDP (dB^2),"Pajarito(Mosek, Gurobi, MSD=false)",Float64,Y(1),1.4226497385782253,29.0800987,true,false
+MISDP (dB^2),"Pajarito(Mosek, Gurobi, MSD=true)",Float64,Y(1),1.4226497372005802,26.2719686,true,false
+MISDP (dB^2),"Pajarito(SCS, Cbc, MSD=false)",Float64,Y(1),1.4226490196466606,141.1404839,false,true
+MISDP (dB^2),"Pajarito(Mosek, Gurobi, MSD=false)",Float64,BB84(1),NaN,NaN,false,false
+MISDP (dB^2),"Pajarito(Mosek, Gurobi, MSD=true)",Float64,BB84(1),1.7094305493549533,68.3456832,false,false
+MISDP (dB^2),"Pajarito(SCS, Cbc, MSD=false)",Float64,BB84(1),NaN,NaN,false,false
+MISDP (dB^2),"Pajarito(Mosek, Gurobi, MSD=false)",Float64,2qutrits(1),1.2551450448490824,31.3867835,false,false
+MISDP (dB^2),"Pajarito(Mosek, Gurobi, MSD=true)",Float64,2qutrits(1),1.255145044849353,31.3980755,false,false
+MISDP (dB^2),"Pajarito(SCS, Cbc, MSD=false)",Float64,2qutrits(1),1.2551424930051753,212.7907068,false,true
+MISDP (dB^2),"Pajarito(Mosek, Gurobi, MSD=false)",Float64,3qutrits(1),NaN,NaN,false,false
+MISDP (dB^2),"Pajarito(Mosek, Gurobi, MSD=true)",Float64,3qutrits(1),NaN,NaN,false,false
+MISDP (dB^2),"Pajarito(SCS, Cbc, MSD=false)",Float64,3qutrits(1),NaN,NaN,false,false
+MISDP (dB^2),"Pajarito(Mosek, Gurobi, MSD=false)",Float64,2qubits(2),NaN,NaN,false,false
+MISDP (dB^2),"Pajarito(Mosek, Gurobi, MSD=true)",Float64,2qubits(2),NaN,NaN,false,false
+MISDP (dB^2),"Pajarito(SCS, Cbc, MSD=false)",Float64,2qubits(2),NaN,NaN,false,false
+MISDP (dB^2),"Pajarito(Mosek, Gurobi, MSD=false)",Float64,3qubits(2),NaN,NaN,false,false
+MISDP (dB^2),"Pajarito(Mosek, Gurobi, MSD=true)",Float64,3qubits(2),NaN,NaN,false,false
+MISDP (dB^2),"Pajarito(SCS, Cbc, MSD=false)",Float64,3qubits(2),NaN,NaN,false,false
+MISDP (dB^2),"Pajarito(Mosek, Gurobi, MSD=false)",Float64,Y(2),NaN,NaN,false,false
+MISDP (dB^2),"Pajarito(Mosek, Gurobi, MSD=true)",Float64,Y(2),NaN,NaN,false,false
+MISDP (dB^2),"Pajarito(SCS, Cbc, MSD=false)",Float64,Y(2),NaN,NaN,false,false
+MISDP (dB^2),"Pajarito(Mosek, Gurobi, MSD=false)",Float64,BB84(2),NaN,NaN,false,false
+MISDP (dB^2),"Pajarito(Mosek, Gurobi, MSD=true)",Float64,BB84(2),NaN,NaN,false,false
+MISDP (dB^2),"Pajarito(SCS, Cbc, MSD=false)",Float64,BB84(2),NaN,NaN,false,false
+MISDP (dB^2),"Pajarito(Mosek, Gurobi, MSD=false)",Float64,2qutrits(2),NaN,NaN,false,false
+MISDP (dB^2),"Pajarito(Mosek, Gurobi, MSD=true)",Float64,2qutrits(2),NaN,NaN,false,false
+MISDP (dB^2),"Pajarito(SCS, Cbc, MSD=false)",Float64,2qutrits(2),NaN,NaN,false,false
+MISDP (dB^2),"Pajarito(Mosek, Gurobi, MSD=false)",Float64,3qutrits(2),NaN,NaN,false,false
+MISDP (dB^2),"Pajarito(Mosek, Gurobi, MSD=true)",Float64,3qutrits(2),NaN,NaN,false,false
+MISDP (dB^2),"Pajarito(SCS, Cbc, MSD=false)",Float64,3qutrits(2),NaN,NaN,false,false

@@ -1,6 +1,6 @@
 using Test, GuessworkQuantumSideInfo, LinearAlgebra, Statistics, Random, UnPack
 using GenericLinearAlgebra
-using SCS
+using SCS, StableRNGs
 
 using Pajarito, Cbc
 

@@ -2,7 +2,7 @@
     guesswork_MISDP(
         p::AbstractVector{T},
         ρBs::AbstractVector{<:AbstractMatrix},
-        num_outcomes;
+        num_outcomes = size(ρBs[1], 1)^2;
         solver,
         c = T.(1:length(p)),
         verbose::Bool = true,
@@ -11,7 +11,7 @@
 Computes an approximation to the guesswork with `num_outcomes` possible guessing
 orders for the c-q state specified by a probability vector `p`, giving the
 distribution `X`, and `ρBs`, giving the associated quantum states. If
-``num_outcomes > d_B^2``, where `d_B` is the dimension of the Hilbert space on
+``num_outcomes ≥ d_B^2``, where `d_B` is the dimension of the Hilbert space on
 which the quantum states live, then this computes exactly the guesswork. Note
 that one may not supply a parameter `K` in this case; in the mixed-integer SDP
 formulation, the guesser is always allowed to make `length(p)` guesses. However,
@@ -38,7 +38,7 @@ problem is not optimally solved.
 function guesswork_MISDP(
     p::AbstractVector{T},
     ρBs::AbstractVector{<:AbstractMatrix},
-    num_outcomes;
+    num_outcomes = size(ρBs[1], 1)^2;
     solver,
     c = T.(1:length(p)),
     verbose::Bool = true,

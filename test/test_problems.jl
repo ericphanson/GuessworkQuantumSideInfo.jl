@@ -209,30 +209,32 @@ Random.seed!(5)
     end
 
     @testset "Quantum states" begin
-        for T in (BigFloat, Float64)
-            for d in (2,3)
-                ρ = randdm(T, d)
-                @test eltype(ρ) == Complex{T}
-                @test tr(ρ) ≈ one(T) rtol=1e-8
-                @test all( x-> x >= -1e-8, eigvals(ρ))
+        for rng in (tuple(), tuple(StableRNG(123))) # test with custom RNG
+            for T in (BigFloat, Float64)
+                for d in (2,3)
+                    ρ = randdm(rng..., T, d)
+                    @test eltype(ρ) == Complex{T}
+                    @test tr(ρ) ≈ one(T) rtol=1e-8
+                    @test all( x-> x >= -1e-8, eigvals(ρ))
+                    
+                    U = GuessworkQuantumSideInfo.randunitary(rng..., T, d)
+                    @test eltype(U) == Complex{T}
+                    @test U' * U ≈ I(d) atol=1e-6
+                    @test U * U' ≈ I(d) atol=1e-6
 
-                U = GuessworkQuantumSideInfo.randunitary(T, d)
-                @test eltype(U) == Complex{T}
-                @test U' * U ≈ I(d) atol=1e-6
-                @test U * U' ≈ I(d) atol=1e-6
+                    k = ket(T, 1, d)
+                    @test k' ≈ bra(T, 1, d) rtol=1e-8
 
-                k = ket(T, 1, d)
-                @test k' ≈ bra(T, 1, d) rtol=1e-8
+                    p = randprobvec(rng..., T, d)
+                    @test eltype(p) == T
+                    @test sum(p) ≈ one(T) rtol=1e-8
+                    @test all( x-> x >= -1e-8, p)
+                end
 
-                p = randprobvec(T, d)
-                @test eltype(p) == T
-                @test sum(p) ≈ one(T) rtol=1e-8
-                @test all( x-> x >= -1e-8, p)
+                ρBs = BB84_states(T)
+                @test length(ρBs) == 4
+                @test Set(iid_copies(ρBs, 2)) == Set([ ρ ⊗ σ for ρ in ρBs for σ in ρBs])
             end
-
-            ρBs = BB84_states(T)
-            @test length(ρBs) == 4
-            @test Set(iid_copies(ρBs, 2)) == Set([ ρ ⊗ σ for ρ in ρBs for σ in ρBs])
         end
         
         # Defaults

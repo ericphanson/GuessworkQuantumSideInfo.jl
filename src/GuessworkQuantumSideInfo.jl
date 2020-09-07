@@ -1,7 +1,7 @@
 module GuessworkQuantumSideInfo
 
 using LinearAlgebra, SparseArrays # standard libraries
-using Random: randperm! # standard library
+using Random: Random, randperm!, AbstractRNG # standard library
 using Convex # Julia SDP solvers / interfaces
 using Combinatorics: multiset_permutations, combinations # used for POVM outcomes
 using UnPack # helper

@@ -100,7 +100,7 @@ function simplexpt(unif)
 end
 
 """
-    randprobvec([T=Float64], d)
+    randprobvec([rng, T=Float64], d)
 
 Generates points of type `T`, uniformly at random on the standard `d-1` dimensional simplex using an algorithm by [Smith and Tromble](http://www.cs.cmu.edu/~nasmith/papers/smith+tromble.tr04.pdf).
 
@@ -115,17 +115,21 @@ julia> randprobvec(3)
 
 ```
 """
-randprobvec(T::Type, d::Integer) = simplexpt(rand(T, d - 1))
+randprobvec(rng::AbstractRNG, ::Type{T}, d::Integer) where T = simplexpt(rand(rng, T, d - 1))
+randprobvec(::Type{T}, d::Integer) where T = randprobvec(Random.GLOBAL_RNG, T, d)
 randprobvec(d::Integer) = randprobvec(Float64, d)
 
 """
-    randunitary([T=Float64], d)
+    randunitary([rng, T=Float64], d)
 
 Generates a unitary matrix of dimension `d` at random according to the Haar measure, using an algorithm described by Maris Ozols in ["How to generate a random unitary matrix"](http://home.lu.lv/~sd20008/papers/essays/Random%20unitary%20%5Bpaper%5D.pdf).
 """
-function randunitary(T::Type, d::Integer)
-    rg1 = T.(randn(d, d))
-    rg2 = T.(randn(d, d))
+function randunitary(rng::AbstractRNG, ::Type{T}, d::Integer) where T
+    # `randn` for `BigFloat`'s isn't supported yet
+    # (https://github.com/JuliaLang/julia/issues/17629)
+    # so we convert afterwards instead (losing some randomness).
+    rg1 = T.(randn(rng, d, d))
+    rg2 = T.(randn(rng, d, d))
     RG = rg1 + im * rg2
     Q, R = qr(RG)
     r = diag(R)
@@ -133,10 +137,11 @@ function randunitary(T::Type, d::Integer)
     return Q * L
 end
 
+randunitary(::Type{T}, d::Integer) where {T} = randunitary(Random.GLOBAL_RNG, T, d)
 randunitary(d::Integer) = randunitary(Float64, d)
 
 """
-    randdm([T = Float64], d)
+    randdm([rng, T = Float64], d)
 
 Generates a density matrix with numeric type `Complex{T}`, of dimension `d` at
 random.
@@ -150,10 +155,12 @@ julia> randdm(2)
  0.119848+0.0371569im  0.522882+0.0im      
 ```
 """
-function randdm(T::Type, d::Integer)
-    eigs = diagm(0 => randprobvec(T, d))
-    U = randunitary(T, d)
+function randdm(rng::AbstractRNG, ::Type{T}, d::Integer) where T
+    eigs = diagm(0 => randprobvec(rng, T, d))
+    U = randunitary(rng, T, d)
     ρ = U * eigs * (U')
     return Matrix((ρ + ρ') / 2)
 end
+
+randdm(::Type{T}, d::Integer) where T = randdm(Random.GLOBAL_RNG, T, d)
 randdm(d) = randdm(Float64, d)
