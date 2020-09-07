@@ -64,7 +64,10 @@ n_problems = length(problems)
 n_algos = length(algos)
 timeout = 60*5
 for problem_idx in 1:n_problems, algo_idx in 1:n_algos
-    algos[algo_idx].algo == "MISDP_dB" || continue
+    # To run just a subset of the problems, a filter can be put such as
+    # the following, which were used when I added algorithms after the first run.
+    ## algos[algo_idx].algo == "MISDP_dB" || continue
+    ## algos[algo_idx].algo == "MISDP (dB^2)" || continue
     f = run_problem(algo_idx, problem_idx; verbose = true)
     f()
 end

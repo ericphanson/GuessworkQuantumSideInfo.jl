@@ -798,3 +798,184 @@ Timed out!
 │ 35  │ MISDP_dB │ Pajarito(Mosek, Gurobi, MSD=true)  │ Float64      │ 3qutrits(2) │ NaN     │ NaN             │
 │ 36  │ MISDP_dB │ Pajarito(SCS, Cbc, MSD=false)      │ Float64      │ 3qutrits(2) │ NaN     │ NaN             │
 ```
+
+Reran the MISDP problems with M=dB^2 (instead of dB^2 + 1, which is not necessary).
+Annoyingly, the algorithm indices are off in the following log, because I had
+removed the `MISDP` version from `algos`. It doesn't matter though, since
+there were no OOMs to get from the logs.
+```julia
+GuessworkQuantumSideInfo.jl/numeric_experiments on  numeric_experiments [$»!]
+13:27:14 ❯ julia --project=. --startup-file=no
+               _
+   _       _ _(_)_     |  Documentation: https://docs.julialang.org
+  (_)     | (_) (_)    |
+   _ _   _| |_  __ _   |  Type "?" for help, "]?" for Pkg help.
+  | | | | | | |/ _` |  |
+  | | |_| | | | (_| |  |  Version 1.5.1 (2020-08-25)
+ _/ |\__'_|_|_|\__'_|  |  Official https://julialang.org/ release
+|__/                   |
+
+julia> include("run_problems.jl")
+[ Info: Precompiling CSV [336ed68f-0bac-5ca0-87d4-7b16caf5d00b]
+[ Info: Precompiling GuessworkQuantumSideInfo [43bf2e5e-2e2b-4a4c-a80a-78ff5d909e07]
+[ Info: Precompiling Pajarito [2f354839-79df-5901-9f0a-cdb2aac6fe30]
+Academic license - for non-commercial use only
+Problem 1/12, algorithm 2/16 100%|██████████████████████████████████████████████████████████████| Time: 0:00:49
+Finished!
+[ Info: SubString{String}["1.2549350272184832", "25.0180601"]
+Problem 1/12, algorithm 4/16 100%|██████████████████████████████████████████████████████████████| Time: 0:00:47
+Finished!
+[ Info: SubString{String}["1.2549349960643177", "24.4915273"]
+Problem 1/12, algorithm 6/16 100%|██████████████████████████████████████████████████████████████| Time: 0:00:50
+Finished!
+[ Info: SubString{String}["1.2549344493592418", "26.5418423"]
+Problem 2/12, algorithm 2/16 100%|██████████████████████████████████████████████████████████████| Time: 0:00:50
+Finished!
+[ Info: SubString{String}["1.5315837236968899", "26.384784"]
+Problem 2/12, algorithm 4/16 100%|██████████████████████████████████████████████████████████████| Time: 0:00:50
+Finished!
+[ Info: SubString{String}["1.531583569528324", "25.8218552"]
+Problem 2/12, algorithm 6/16 100%|██████████████████████████████████████████████████████████████| Time: 0:02:49
+Finished!
+┌ Error: ┌ Warning: Repeated integer solution without converging
+│ └ @ Pajarito ~/.julia/packages/Pajarito/TFExZ/src/conic_algorithm.jl:1687
+└ @ Main /mnt/c/Users/eric/Code/GuessworkQuantumSideInfo.jl/numeric_experiments/run_problems.jl:42
+[ Info: SubString{String}["1.5315809630022876", "144.9346841"]
+Problem 3/12, algorithm 2/16 100%|██████████████████████████████████████████████████████████████| Time: 0:00:52
+Finished!
+┌ Warning: MOSEK warning 705: #36 (nearly) zero elements are specified in sparse row ''(0) of matrix 'A'.
+│ MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1225) of matrix 'A'.
+│ MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1226) of matrix 'A'.
+│ MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1227) of matrix 'A'.
+│ MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1228) of matrix 'A'.
+│ MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1229) of matrix 'A'.
+│ MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1230) of matrix 'A'.
+│ MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1231) of matrix 'A'.
+│ MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1232) of matrix 'A'.
+│ MOSEK warning 705: #36 (nearly) zero elements are specified in sparse row ''(0) of matrix 'A'.
+│ MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1249) of matrix 'A'.
+│ MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1250) of matrix 'A'.
+│ MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1251) of matrix 'A'.
+│ MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1252) of matrix 'A'.
+│ MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1253) of matrix 'A'.
+│ MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1254) of matrix 'A'.
+│ MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1255) of matrix 'A'.
+│ MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1256) of matrix 'A'.
+└ @ Main /mnt/c/Users/eric/Code/GuessworkQuantumSideInfo.jl/numeric_experiments/run_problems.jl:47
+[ Info: SubString{String}["MOSEK warning 705: #36 (nearly) zero elements are specified in sparse row ''(0) of matrix 'A'.", "MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1225) of matrix 'A'.", "MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1226) of matrix 'A'.", "MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1227) of matrix 'A'.", "MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1228) of matrix 'A'.", "MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1229) of matrix 'A'.", "MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1230) of matrix 'A'.", "MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1231) of matrix 'A'.", "MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1232) of matrix 'A'.", "MOSEK warning 705: #36 (nearly) zero elements are specified in sparse row ''(0) of matrix 'A'.", "MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1249) of matrix 'A'.", "MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1250) of matrix 'A'.", "MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1251) of matrix 'A'.", "MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1252) of matrix 'A'.", "MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1253) of matrix 'A'.", "MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1254) of matrix 'A'.", "MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1255) of matrix 'A'.", "MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1256) of matrix 'A'.", "1.4226497385782253", "29.0800987"]
+Problem 3/12, algorithm 4/16 100%|██████████████████████████████████████████████████████████████| Time: 0:00:49
+Finished!
+┌ Warning: MOSEK warning 705: #36 (nearly) zero elements are specified in sparse row ''(0) of matrix 'A'.
+│ MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1225) of matrix 'A'.
+│ MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1226) of matrix 'A'.
+│ MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1227) of matrix 'A'.
+│ MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1228) of matrix 'A'.
+│ MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1229) of matrix 'A'.
+│ MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1230) of matrix 'A'.
+│ MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1231) of matrix 'A'.
+│ MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1232) of matrix 'A'.
+│ MOSEK warning 705: #36 (nearly) zero elements are specified in sparse row ''(0) of matrix 'A'.
+│ MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1249) of matrix 'A'.
+│ MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1250) of matrix 'A'.
+│ MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1251) of matrix 'A'.
+│ MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1252) of matrix 'A'.
+│ MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1253) of matrix 'A'.
+│ MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1254) of matrix 'A'.
+│ MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1255) of matrix 'A'.
+│ MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1256) of matrix 'A'.
+└ @ Main /mnt/c/Users/eric/Code/GuessworkQuantumSideInfo.jl/numeric_experiments/run_problems.jl:47
+[ Info: SubString{String}["MOSEK warning 705: #36 (nearly) zero elements are specified in sparse row ''(0) of matrix 'A'.", "MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1225) of matrix 'A'.", "MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1226) of matrix 'A'.", "MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1227) of matrix 'A'.", "MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1228) of matrix 'A'.", "MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1229) of matrix 'A'.", "MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1230) of matrix 'A'.", "MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1231) of matrix 'A'.", "MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1232) of matrix 'A'.", "MOSEK warning 705: #36 (nearly) zero elements are specified in sparse row ''(0) of matrix 'A'.", "MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1249) of matrix 'A'.", "MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1250) of matrix 'A'.", "MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1251) of matrix 'A'.", "MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1252) of matrix 'A'.", "MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1253) of matrix 'A'.", "MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1254) of matrix 'A'.", "MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1255) of matrix 'A'.", "MOSEK warning 705: #6 (nearly) zero elements are specified in sparse row ''(1256) of matrix 'A'.", "1.4226497372005802", "26.2719686"]
+Problem 3/12, algorithm 6/16 100%|██████████████████████████████████████████████████████████████| Time: 0:02:44
+Finished!
+┌ Error: ┌ Warning: Repeated integer solution without converging
+│ └ @ Pajarito ~/.julia/packages/Pajarito/TFExZ/src/conic_algorithm.jl:1687
+└ @ Main /mnt/c/Users/eric/Code/GuessworkQuantumSideInfo.jl/numeric_experiments/run_problems.jl:42
+[ Info: SubString{String}["1.4226490196466606", "141.1404839"]
+Problem 4/12, algorithm 2/16 100%|██████████████████████████████████████████████████████████████| Time: 0:05:01
+Timed out!
+Problem 4/12, algorithm 4/16 100%|██████████████████████████████████████████████████████████████| Time: 0:01:33
+Finished!
+[ Info: SubString{String}["1.7094305493549533", "68.3456832"]
+Problem 4/12, algorithm 6/16 100%|██████████████████████████████████████████████████████████████| Time: 0:05:01
+Timed out!
+Problem 5/12, algorithm 2/16 100%|██████████████████████████████████████████████████████████████| Time: 0:00:54
+Finished!
+[ Info: SubString{String}["1.2551450448490824", "31.3867835"]
+Problem 5/12, algorithm 4/16 100%|██████████████████████████████████████████████████████████████| Time: 0:00:57
+Finished!
+[ Info: SubString{String}["1.255145044849353", "31.3980755"]
+Problem 5/12, algorithm 6/16 100%|██████████████████████████████████████████████████████████████| Time: 0:03:59
+Finished!
+┌ Error: ┌ Warning: Repeated integer solution without converging
+│ └ @ Pajarito ~/.julia/packages/Pajarito/TFExZ/src/conic_algorithm.jl:1687
+└ @ Main /mnt/c/Users/eric/Code/GuessworkQuantumSideInfo.jl/numeric_experiments/run_problems.jl:42
+[ Info: SubString{String}["1.2551424930051753", "212.7907068"]
+Problem 6/12, algorithm 2/16 100%|██████████████████████████████████████████████████████████████| Time: 0:05:01
+Timed out!
+Problem 6/12, algorithm 4/16 100%|██████████████████████████████████████████████████████████████| Time: 0:05:01
+Timed out!
+Problem 6/12, algorithm 6/16 100%|██████████████████████████████████████████████████████████████| Time: 0:05:01
+Timed out!
+Problem 7/12, algorithm 2/16 100%|██████████████████████████████████████████████████████████████| Time: 0:05:01
+Timed out!
+Problem 7/12, algorithm 4/16 100%|██████████████████████████████████████████████████████████████| Time: 0:05:01
+Timed out!
+Problem 7/12, algorithm 6/16 100%|██████████████████████████████████████████████████████████████| Time: 0:05:01
+Timed out!
+Problem 8/12, algorithm 2/16 100%|██████████████████████████████████████████████████████████████| Time: 0:05:01
+Timed out!
+Problem 8/12, algorithm 4/16 100%|██████████████████████████████████████████████████████████████| Time: 0:05:01
+Timed out!
+Problem 8/12, algorithm 6/16 100%|██████████████████████████████████████████████████████████████| Time: 0:05:01
+Timed out!
+Problem 9/12, algorithm 2/16 100%|██████████████████████████████████████████████████████████████| Time: 0:05:01
+Timed out!
+Problem 9/12, algorithm 4/16 100%|██████████████████████████████████████████████████████████████| Time: 0:05:01
+Timed out!
+Problem 9/12, algorithm 6/16 100%|██████████████████████████████████████████████████████████████| Time: 0:05:01
+Timed out!
+Problem 10/12, algorithm 2/16 100%|█████████████████████████████████████████████████████████████| Time: 0:05:01
+Timed out!
+Problem 10/12, algorithm 4/16 100%|█████████████████████████████████████████████████████████████| Time: 0:05:01
+Timed out!
+Problem 10/12, algorithm 6/16 100%|█████████████████████████████████████████████████████████████| Time: 0:05:01
+Timed out!
+Problem 11/12, algorithm 2/16 100%|█████████████████████████████████████████████████████████████| Time: 0:05:01
+Timed out!
+Problem 11/12, algorithm 4/16 100%|█████████████████████████████████████████████████████████████| Time: 0:05:01
+Timed out!
+Problem 11/12, algorithm 6/16 100%|█████████████████████████████████████████████████████████████| Time: 0:05:01
+Timed out!
+Problem 12/12, algorithm 2/16 100%|█████████████████████████████████████████████████████████████| Time: 0:05:01
+Timed out!
+Problem 12/12, algorithm 4/16 100%|█████████████████████████████████████████████████████████████| Time: 0:05:01
+Timed out!
+Problem 12/12, algorithm 6/16 100%|█████████████████████████████████████████████████████████████| Time: 0:05:01
+Timed out!
+36×8 DataFrame. Omitted printing of 2 columns
+│ Row │ algo         │ settings                           │ numeric_type │ problem     │ optval  │ elapsed_seconds │
+│     │ String       │ String                             │ String       │ String      │ Float64 │ Float64         │
+├─────┼──────────────┼────────────────────────────────────┼──────────────┼─────────────┼─────────┼─────────────────┤
+│ 1   │ MISDP (dB^2) │ Pajarito(Mosek, Gurobi, MSD=false) │ Float64      │ 2qubits(1)  │ 1.25494 │ 25.0181         │
+│ 2   │ MISDP (dB^2) │ Pajarito(Mosek, Gurobi, MSD=true)  │ Float64      │ 2qubits(1)  │ 1.25493 │ 24.4915         │
+│ 3   │ MISDP (dB^2) │ Pajarito(SCS, Cbc, MSD=false)      │ Float64      │ 2qubits(1)  │ 1.25493 │ 26.5418         │
+│ 4   │ MISDP (dB^2) │ Pajarito(Mosek, Gurobi, MSD=false) │ Float64      │ 3qubits(1)  │ 1.53158 │ 26.3848         │
+│ 5   │ MISDP (dB^2) │ Pajarito(Mosek, Gurobi, MSD=true)  │ Float64      │ 3qubits(1)  │ 1.53158 │ 25.8219         │
+│ 6   │ MISDP (dB^2) │ Pajarito(SCS, Cbc, MSD=false)      │ Float64      │ 3qubits(1)  │ 1.53158 │ 144.935         │
+│ 7   │ MISDP (dB^2) │ Pajarito(Mosek, Gurobi, MSD=false) │ Float64      │ Y(1)        │ 1.42265 │ 29.0801         │
+│ 8   │ MISDP (dB^2) │ Pajarito(Mosek, Gurobi, MSD=true)  │ Float64      │ Y(1)        │ 1.42265 │ 26.272          │
+│ 9   │ MISDP (dB^2) │ Pajarito(SCS, Cbc, MSD=false)      │ Float64      │ Y(1)        │ 1.42265 │ 141.14          │
+│ 10  │ MISDP (dB^2) │ Pajarito(Mosek, Gurobi, MSD=false) │ Float64      │ BB84(1)     │ NaN     │ NaN             │
+⋮
+│ 26  │ MISDP (dB^2) │ Pajarito(Mosek, Gurobi, MSD=true)  │ Float64      │ Y(2)        │ NaN     │ NaN             │
+│ 27  │ MISDP (dB^2) │ Pajarito(SCS, Cbc, MSD=false)      │ Float64      │ Y(2)        │ NaN     │ NaN             │
+│ 28  │ MISDP (dB^2) │ Pajarito(Mosek, Gurobi, MSD=false) │ Float64      │ BB84(2)     │ NaN     │ NaN             │
+│ 29  │ MISDP (dB^2) │ Pajarito(Mosek, Gurobi, MSD=true)  │ Float64      │ BB84(2)     │ NaN     │ NaN             │
+│ 30  │ MISDP (dB^2) │ Pajarito(SCS, Cbc, MSD=false)      │ Float64      │ BB84(2)     │ NaN     │ NaN             │
+│ 31  │ MISDP (dB^2) │ Pajarito(Mosek, Gurobi, MSD=false) │ Float64      │ 2qutrits(2) │ NaN     │ NaN             │
+│ 32  │ MISDP (dB^2) │ Pajarito(Mosek, Gurobi, MSD=true)  │ Float64      │ 2qutrits(2) │ NaN     │ NaN             │
+│ 33  │ MISDP (dB^2) │ Pajarito(SCS, Cbc, MSD=false)      │ Float64      │ 2qutrits(2) │ NaN     │ NaN             │
+│ 34  │ MISDP (dB^2) │ Pajarito(Mosek, Gurobi, MSD=false) │ Float64      │ 3qutrits(2) │ NaN     │ NaN             │
+│ 35  │ MISDP (dB^2) │ Pajarito(Mosek, Gurobi, MSD=true)  │ Float64      │ 3qutrits(2) │ NaN     │ NaN             │
+│ 36  │ MISDP (dB^2) │ Pajarito(SCS, Cbc, MSD=false)      │ Float64      │ 3qutrits(2) │ NaN     │ NaN             │
+```

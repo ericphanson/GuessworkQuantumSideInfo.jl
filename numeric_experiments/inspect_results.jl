@@ -1,10 +1,17 @@
 using CSV, DataFrames, Statistics
 using Printf
-
 df = CSV.read(joinpath(@__DIR__, "results.csv"))
 
+## This bit is a little annoying:
+# To check for OOMs, we need to manually look through the log (see `log.md`)
+# Which was numbered according to the algorithm and problem index.
+# However, later two more algorithms were added (`MISDP_dB` and `MISDP (dB^2)`)
+# which can mess up the numbering. So first we will filter out those to mimick
+# the state of the first run, and add flags for OOMs.
+include("common.jl") # need to load the list of algorithms (`algos`)
+
 algos_pre_dB = filter(algos) do a
-    a.algo != "MISDP_dB"
+    a.algo != "MISDP_dB" && a.algo != "MISDP (dB^2)"
 end
 
 # Looking through `log.md`, we find two issues:
@@ -19,6 +26,13 @@ for (p_idx, a_idx) in OOM
     inds .= inds .| ((df.problem .== problems[p_idx].problem) .& (df.algo .== algos_pre_dB[a_idx].algo) .& (df.settings .== algos_pre_dB[a_idx].settings))
 end
 df.OOM = inds
+## End of problem-index specific content.
+
+# Now we will filter out the `MISDP` algorithm (which had `dB^2 + 1` entries, which
+# is 1 more than needed, and is replaced by the `MISDP (dB^2)` version.
+df = filter(df) do row
+    row.algo != "MISDP"
+end
 
 df.timeout = isnan.(df.optval) .& (!).(df.errors)
 
@@ -30,9 +44,11 @@ row_should_be_correct(row) = !startswith(row.algo, "guesswork_upper_bound") && !
 df_right = filter(row_should_be_correct, df)
 gdf_right = groupby(df_right, "problem")
 
-# Check for BB84
+# Check for BB84(1)
 bb84_true_val = (big(1) / big(4)) * (10 - sqrt(big(10)))
-@show maximum((gdf_right[4].optval .- bb84_true_val ) ./ bb84_true_val)
+
+@assert all(gdf_right[4].problem .== Ref("BB84(1)")) # check we've got the right group
+@assert maximum((gdf_right[4].optval .- bb84_true_val ) ./ bb84_true_val) < 1e-7 # not too big of an error
 
 mean_solutions_df = combine(gdf_right, :optval => mean)
 mean_solutions = Dict(mean_solutions_df.problem .=> mean_solutions_df.optval_mean)
@@ -45,7 +61,7 @@ df.relative_discrepency_from_mean = [ isnan(row.optval) ? NaN : !haskey(mean_sol
 
 # Let us check the maximum discrepency is not too bad
 df_right = filter(row_should_be_correct, df)
-findmax(df_right.relative_discrepency_from_mean) # (2.5045972952685647e-6, 59)
+findmax(df_right.relative_discrepency_from_mean) # (1.7202621117336732e-6, 45)
 
 # Now let us generate the final table.
 ## Rows in table: algorithm with settings
@@ -59,11 +75,11 @@ function pretty_algo(row)
     end
     if row.algo == "MISDP_dB"
         return "MISDP (\$d_B\$)"
-    end
-    if row.algo == "MISDP"
+    elseif row.algo == "MISDP"
         return "MISDP (\$d_B^2 + 1\$)"
-    end
-    if row.algo == "dual_SDP"
+    elseif row.algo == "MISDP (dB^2)"
+        return "MISDP (\$d_B^2\$)"
+    elseif row.algo == "dual_SDP"
         return "SDP (dual)"
     end
     return row.algo
@@ -97,8 +113,8 @@ function mean_no_nan(collection)
     isempty(c) ? missing : mean(c)
 end
 float_fmt(f) = @sprintf("%2.2f", f)
-pct_fmt(f) = "\\SI{" * float_fmt(f*100) * "}{\\%}"
-time_fmt(f) =  "\\SI{" *float_fmt(f) * "}{s}"
+pct_fmt(f) =  float_fmt(f*100) * "\\,\\%"
+time_fmt(f) =  float_fmt(f) * "\\,s"
 
 table1 = combine(gdf, :relative_discrepency_from_mean => pct_fmt ∘ mean_no_nan => "average relative error", :elapsed_seconds => time_fmt ∘ mean_no_nan => "average time", :optval => (x -> sum((!isnan).(x))) => "solved", :timeout => sum => "timeouts", :error_not_solved_not_timeout => sum => "errors")
 
@@ -112,7 +128,7 @@ df2 = copy(df)
 
 
 function tol_time(row)
-    disc = ismissing(row.relative_discrepency_from_mean) ? "(?~\\%)" : isnan(row.relative_discrepency_from_mean) ? "" : "("* pct_fmt(row.relative_discrepency_from_mean)*")"
+    disc = ismissing(row.relative_discrepency_from_mean) ? "(?\\,\\%)" : isnan(row.relative_discrepency_from_mean) ? "" : "("* pct_fmt(row.relative_discrepency_from_mean)*")"
     
     time = row.time_status isa Symbol ? string(row.time_status) : time_fmt(row.elapsed_seconds)
     disc == "" ? time : "$time $disc"

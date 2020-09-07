@@ -72,8 +72,12 @@ for (misdp_solver, settings) in [(PajaritoSolver(cont_solver=MosekSolver(LOG=0),
         (; f = (prob -> @timed guesswork_MISDP(prob.p, prob.ρBs, size(first(prob.ρBs),1); solver=misdp_solver, verbose=false).optval), algo = "MISDP_dB",
                                                                                                                               settings))
     push!(algos,
-          (; f = (prob -> @timed guesswork_MISDP(prob.p, prob.ρBs; solver=misdp_solver, verbose=false).optval), algo = "MISDP",
+          (; f = (prob -> @timed guesswork_MISDP(prob.p, prob.ρBs, size(first(prob.ρBs), 1)^2; solver=misdp_solver, verbose=false).optval), algo = "MISDP",
                                                                                                                    settings))
+
+    push!(algos,
+        (; f = (prob -> @timed guesswork_MISDP(prob.p, prob.ρBs, size(first(prob.ρBs), 1);
+        solver=misdp_solver, verbose=false).optval), algo = "MISDP (dB^2)", settings))
 end
 
 for (sdp_solver, settings) in
